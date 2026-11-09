@@ -1,0 +1,28 @@
+{
+  "fuente": "Ajuntament de València, datos abiertos: datos horarios de calidad del aire (2016-2022)",
+  "estaciones": [
+    "Avda. Francia",
+    "Bulevard Sud",
+    "Pista Silla",
+    "Politecnico",
+    "Viveros"
+  ],
+  "anios": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022
+  ],
+  "no2_media": [
+    29.8,
+    30.8,
+    27.7,
+    24.5,
+    18.4,
+    17.2,
+    16.0
+  ]
+}

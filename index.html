@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Respira VLC · Marinada Labs</title>
+  <meta name="description" content="Respira VLC: red de sensores de calidad del aire y app que mide el aire de València calle a calle. Proyecto educativo de 2.º ASIR sobre el ODS 11.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+
+  <!-- Antes de pintar nada aplicamos el tema guardado para evitar un parpadeo claro/oscuro -->
+  <script>
+    try {
+      var temaGuardado = localStorage.getItem('respira-tema');
+      if (temaGuardado === 'light' || temaGuardado === 'dark') {
+        document.documentElement.setAttribute('data-theme', temaGuardado);
+      }
+    } catch (e) { /* almacenamiento bloqueado: usamos el tema del sistema */ }
+  </script>
+
+  <!-- Tipografía Bricolage Grotesque: copia local en vendor/fonts (se declara en css/styles.css), funciona sin Internet -->
+
+  <!-- Leaflet (mapa): copia local en vendor/ para que funcione sin Internet en clase -->
+  <link rel="stylesheet" href="vendor/leaflet.min.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/experience.css">
+  <link rel="stylesheet" href="css/story.css">
+</head>
+<body>
+  <a class="saltar" href="#principal">Saltar al contenido</a>
+
+  <!-- ===================== CABECERA Y NAVEGACIÓN FIJA ===================== -->
+  <header class="cabecera" id="cabecera">
+    <div class="cabecera__dentro">
+      <a class="marca" href="#inicio" aria-label="Respira VLC de Marinada Labs, volver al inicio">
+        <img src="img/respira-vlc.svg" alt="" width="40" height="40">
+        <span>Respira VLC<small>por Marinada Labs</small></span>
+      </a>
+
+      <nav class="nav" id="nav" aria-label="Secciones de la página">
+        <ul>
+          <li><a href="#ods">El problema</a></li>
+          <li><a href="#como-funciona">Cómo funciona</a></li>
+          <li><a href="#mapa">Mapa</a></li>
+          <li><a href="#datos">Datos</a></li>
+          <li><a href="#calculadora">Calculadora</a></li>
+          <li><a href="#equipo">Equipo</a></li>
+          <li><a class="nav__gamas" href="#catalogo">Gamas ↗</a></li>
+        </ul>
+      </nav>
+
+      <div class="cabecera__acciones">
+        <button class="boton-movimiento" id="boton-movimiento" type="button" aria-pressed="false" aria-label="Pausar animaciones" title="Pausar animaciones"><svg class="icono-pausa" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5v14M16 5v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="icono-play" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="m8 5 11 7-11 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
+
+        <button class="boton-tema" id="boton-tema" type="button" aria-label="Cambiar a modo oscuro" aria-pressed="false">
+          <!-- Icono de sol y luna: CSS muestra uno u otro según el tema -->
+          <svg class="icono-luna" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <svg class="icono-sol" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="boton-menu" id="boton-menu" type="button" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="principal">
+
+    <!-- ===================== 1. PORTADA (HERO) ===================== -->
+    <section class="hero" id="inicio" aria-labelledby="titulo-hero">
+      <canvas class="hero__lienzo" id="lienzo-aire" aria-hidden="true"></canvas>
+      <div class="hero__contenido">
+        <div class="hero__texto">
+          <p class="hero__etiqueta"><span aria-hidden="true"></span> TECNOLOGÍA LOCAL. AIRE COMPARTIDO.</p>
+          <h1 id="titulo-hero">Tu ciudad.<br>Tu calle.<br><span class="hero__resalte">Tu aire.</span></h1>
+          <p class="hero__eslogan">El aire cambia de una calle a otra.<br>La forma de medirlo también debería.</p>
+          <p class="hero__descripcion">Proponemos una red de sensores en colegios, farolas y transporte público para conocer mejor el aire de València. Y tomar mejores decisiones, juntos.</p>
+          <div class="hero__botones">
+            <a class="boton boton--principal" href="#mapa">Explorar el mapa <span aria-hidden="true">↗</span></a>
+            <a class="boton boton--secundario" href="#como-funciona">Conoce el proyecto <span aria-hidden="true">↓</span></a>
+          </div>
+          <p class="hero__nota"><svg viewBox="0 0 20 20" width="17" height="17" aria-hidden="true"><path d="m10 2 6 3v5c0 4-6 7-6 7s-6-3-6-7V5Z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m7 9 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg> Datos oficiales. Propuesta abierta. Proyecto educativo.</p>
+        </div>
+        <figure class="aire-vista" aria-labelledby="pie-aire">
+          <div class="aire-vista__mapa">
+            <div class="aire-vista__cabecera"><span class="aire-vista__senal" aria-hidden="true">⌁</span><span>VALÈNCIA<br><strong>Una ciudad. Muchos aires.</strong></span><span class="aire-vista__anio">2024</span></div>
+            <svg class="aire-plano" viewBox="0 0 560 520" aria-hidden="true">
+              <defs>
+                <pattern id="manzanas" width="86" height="74" patternUnits="userSpaceOnUse" patternTransform="rotate(-24 280 260)">
+                  <rect x="9" y="9" width="65" height="52" rx="7" fill="#d8e7dd" stroke="#ceded3"/>
+                  <rect x="16" y="16" width="51" height="38" rx="3" fill="#e7eee5"/>
+                </pattern>
+              </defs>
+              <rect width="560" height="520" fill="#edf2e9"/>
+              <rect width="560" height="520" fill="url(#manzanas)"/>
+              <path d="M-30 151C81 144 98 226 191 218S279 122 359 146s98 102 232 55" fill="none" stroke="#bbd5b8" stroke-width="47"/>
+              <path d="M-30 151C81 144 98 226 191 218S279 122 359 146s98 102 232 55" fill="none" stroke="#d3e4c5" stroke-width="29"/>
+              <g fill="none" stroke="#fafbf5" stroke-width="14"><path d="m62-20 268 560M285-20 259 560M-20 327l600-88M-20 410l600-85"/></g>
+              <g fill="none" stroke="#b9cdbf" stroke-width="1.5"><path d="m62-20 268 560M285-20 259 560M-20 327l600-88M-20 410l600-85"/></g>
+              <path d="m374 520 45-98 65-45 76 5v138Z" fill="#b9d8d4"/>
+              <path d="m389 520 42-87 64-42 65 5" fill="none" stroke="#dcece4" stroke-width="5"/>
+              <g fill="#b0c8a8"><circle cx="92" cy="173" r="8"/><circle cx="113" cy="188" r="7"/><circle cx="326" cy="138" r="9"/><circle cx="348" cy="143" r="7"/><circle cx="454" cy="207" r="8"/><circle cx="475" cy="211" r="6"/></g>
+              <g font-family="system-ui,sans-serif" font-size="10" font-weight="600" letter-spacing="2" fill="#647d6a"><text x="338" y="115" transform="rotate(-24 338 115)">VIVERS</text><text x="370" y="305" transform="rotate(-9 370 305)">CENTRE</text><text x="467" y="477" transform="rotate(-65 467 477)">MEDITERRANI</text></g>
+              <g class="aire-nodo aire-nodo--activo" data-nodo="Olivereta" transform="translate(143 150)"><circle r="29" class="aire-nodo__halo"/><circle r="13"/><circle r="4" class="aire-nodo__centro"/></g>
+              <g class="aire-nodo" data-nodo="Centre" transform="translate(344 275)"><circle r="29" class="aire-nodo__halo"/><circle r="11"/><circle r="3" class="aire-nodo__centro"/></g>
+              <g class="aire-nodo" data-nodo="Vivers" transform="translate(351 175)"><circle r="29" class="aire-nodo__halo"/><circle r="11"/><circle r="3" class="aire-nodo__centro"/></g>
+              <g class="aire-nodo" data-nodo="Politècnic" transform="translate(459 112)"><circle r="29" class="aire-nodo__halo"/><circle r="11"/><circle r="3" class="aire-nodo__centro"/></g>
+              <g class="aire-nodo" data-nodo="Av. França" transform="translate(462 329)"><circle r="29" class="aire-nodo__halo"/><circle r="11"/><circle r="3" class="aire-nodo__centro"/></g>
+              <g class="aire-nodo" data-nodo="Bulevard Sud" transform="translate(333 449)"><circle r="29" class="aire-nodo__halo"/><circle r="11"/><circle r="3" class="aire-nodo__centro"/></g>
+              <g class="aire-nodo" data-nodo="Molí del Sol" transform="translate(58 111)"><circle r="29" class="aire-nodo__halo"/><circle r="11"/><circle r="3" class="aire-nodo__centro"/></g>
+              <g class="aire-nodo" data-nodo="Pista de Silla" transform="translate(232 467)"><circle r="29" class="aire-nodo__halo"/><circle r="11"/><circle r="3" class="aire-nodo__centro"/></g>
+              <g class="aire-rutas" fill="none" stroke="#347b58" stroke-width="2"><path d="M143 150Q210 75 351 175T459 112"/><path d="M143 150Q260 380 344 275T462 329"/><path d="M344 275Q400 390 333 449"/></g>
+            </svg>
+            <div class="estacion-card">
+              <label for="estacion-portada">EXPLORA EL AIRE POR ESTACIÓN</label>
+              <select id="estacion-portada" aria-describedby="estacion-contexto" disabled><option selected>Olivereta</option><option>Av. França</option><option>Bulevard Sud</option><option>Molí del Sol</option><option>Pista de Silla</option><option>Politècnic</option><option>Vivers</option><option>Centre</option></select>
+              <div id="estacion-lectura" aria-live="polite" aria-atomic="true">
+                <p class="estacion-card__valor"><strong id="estacion-valor">30</strong><span>µg/m³<small>NO₂ · media anual</small></span></p>
+                <p class="estacion-card__estado" id="estacion-estado">Por encima de la referencia UE 2030</p>
+                <div class="estacion-card__escala" id="estacion-escala" style="--medida:75%" aria-hidden="true"><i></i><span></span></div>
+                <p class="estacion-card__referencia" id="estacion-contexto">Referencia UE 2030: 20 µg/m³</p>
+              </div>
+              <a href="#datos">Ver el análisis completo <span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="aire-vista__norte" aria-hidden="true">N<span>↑</span></div>
+            <span class="aire-vista__pie">UN AIRE MEJOR EMPIEZA POR CONOCERLO.</span>
+          </div>
+          <figcaption id="pie-aire">Plano ilustrativo · Datos oficiales de 2024, no en tiempo real.<br>Consulta las ubicaciones exactas en el <a href="#mapa">mapa interactivo</a>.</figcaption>
+        </figure>
+      </div>
+      <div class="hero__balance">
+        <p class="hero__balance-titulo">El punto<br>de partida <span aria-hidden="true">↘</span></p>
+        <ul class="hero__cifras">
+          <li><strong>08<span>estaciones</span></strong><span>con media oficial de NO₂ en 2024</span></li>
+          <li><strong>30<span>µg/m³</span></strong><span>NO₂ en Olivereta · media de 2024</span></li>
+          <li><strong>×2,5<span>en hora punta</span></strong><span>NO₂ a las 7:00 frente a las 3:00 · 2022</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Una demostración visual del concepto; no simula mediciones oficiales. -->
+    <section class="brisa-lab" id="brisa" aria-labelledby="titulo-brisa">
+      <div class="brisa-lab__grid contenedor">
+        <div class="brisa-lab__texto">
+          <p class="brisa-lab__etiqueta"><span aria-hidden="true"></span> UN POCO DE AIRE. UN GRAN CAMBIO.</p>
+          <h2 id="titulo-brisa">Dale aire<br>a la <em>ciudad.</em></h2>
+          <p>La marinada es la brisa que llega del mar.<br>Nos inspira a conectar la ciudad y hacer visible lo que respiras.</p>
+          <div class="brisa-lab__acciones">
+            <button class="brisa-boton" id="activar-brisa" type="button" aria-pressed="false" disabled><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 8h12a3 3 0 1 0-3-3M3 12h17M3 16h9a3 3 0 1 1-3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Activa la marinada</span><span aria-hidden="true">↗</span></button>
+            <p class="brisa-lab__instruccion">Mueve el cursor por la red y juega con el aire.</p>
+          </div>
+          <p class="brisa-lab__nota">Simulación visual del concepto, sin mediciones reales.</p>
+        </div>
+        <div class="brisa-escena" id="brisa-escena" role="group" aria-label="Red ilustrativa de sensores en colegios, farolas, autobuses y bicicletas">
+          <canvas id="lienzo-brisa" aria-hidden="true"></canvas>
+          <div class="brisa-orbita brisa-orbita--1" aria-hidden="true"></div>
+          <div class="brisa-orbita brisa-orbita--2" aria-hidden="true"></div>
+          <div class="brisa-orbita brisa-orbita--3" aria-hidden="true"></div>
+          <svg class="brisa-conexiones" viewBox="0 0 640 540" aria-hidden="true"><path d="M320 270Q130 280 110 115M320 270Q510 280 530 115M320 270Q130 270 105 425M320 270Q500 270 535 425"/></svg>
+          <div class="brisa-terminal brisa-terminal--cole"><span aria-hidden="true">⌂</span><div>Respira Escola<small>EN EL COLEGIO</small></div><i aria-hidden="true"></i></div>
+          <div class="brisa-terminal brisa-terminal--farola"><span aria-hidden="true">☀</span><div>Respira Ciutat<small>EN LA CALLE</small></div><i aria-hidden="true"></i></div>
+          <div class="brisa-terminal brisa-terminal--emt"><span aria-hidden="true">↔</span><div>Respira Mòbil<small>EN EL AUTOBÚS</small></div><i aria-hidden="true"></i></div>
+          <div class="brisa-terminal brisa-terminal--bici"><span aria-hidden="true">◎</span><div>Respira Mòbil<small>EN TU BICI</small></div><i aria-hidden="true"></i></div>
+          <div class="sensor-3d" aria-hidden="true"><div class="sensor-3d__cara"><span class="sensor-3d__marca">respira<span>VLC</span></span><div class="sensor-3d__pantalla"><span>AIRE COMPARTIDO</span><svg viewBox="0 0 120 40"><path d="M0 20Q15 0 30 20T60 20T90 20T120 20"/></svg><strong>Conectamos.</strong></div><div class="sensor-3d__luces"><i></i><i></i><i></i></div><div class="sensor-3d__ranuras"></div></div><div class="sensor-3d__lado"></div></div>
+          <div class="brisa-escena__estado"><span aria-hidden="true"></span><span id="estado-brisa" aria-live="polite">Red en calma · activa la brisa</span></div>
+        </div>
+      </div>
+    </section>
+    <div class="cinta-aire" aria-hidden="true"><div><span>MENOS HUMO <i>↗</i> MÁS BARRIO <i>✳</i> VALÈNCIA RESPIRA <i>↗</i> MÁS FUTURO <i>✳</i></span><span>MENOS HUMO <i>↗</i> MÁS BARRIO <i>✳</i> VALÈNCIA RESPIRA <i>↗</i> MÁS FUTURO <i>✳</i></span></div></div>
+
+    <!-- ===================== 2. EL ODS 11 Y EL PROBLEMA ===================== -->
+    <section class="seccion" id="ods" aria-labelledby="titulo-ods">
+      <div class="contenedor">
+        <div class="ods-cabecera">
+          <div class="ods-insignia" aria-hidden="true">
+            <span class="ods-insignia__num">11</span>
+            <span class="ods-insignia__texto">Ciudades y comunidades sostenibles</span>
+          </div>
+          <div>
+            <p class="seccion__etiqueta">01 / LEER LA CIUDAD</p>
+        <h2 id="titulo-ods">Cumplimos hoy. No cumplimos mañana.</h2>
+            <p class="entradilla">El <strong>Objetivo de Desarrollo Sostenible 11</strong> de la ONU busca ciudades inclusivas, seguras, resilientes y sostenibles. Su <strong>meta 11.6</strong> pide reducir de aquí a 2030 el impacto ambiental negativo por habitante de las ciudades, <em>prestando especial atención a la calidad del aire</em>.</p>
+          </div>
+        </div>
+
+        <!-- Hechos de contexto con iconos propios -->
+        <ul class="hechos">
+          <li class="hecho">
+            <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><path d="M24 6c8 5 14 12 14 20a14 14 0 0 1-28 0c0-8 6-15 14-20Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M24 40V22m0 8 6-6m-6 2-5-5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            <div>
+              <h3>Capital Verde Europea 2024</h3>
+              <p>La Comisión Europea eligió a València como Capital Verde Europea de 2024. La ciudad ya ha apostado por el medio ambiente.</p>
+            </div>
+          </li>
+          <li class="hecho">
+            <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><rect x="7" y="10" width="34" height="28" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><path d="M7 30h34" stroke="currentColor" stroke-width="3"/><circle cx="16" cy="38" r="4" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="32" cy="38" r="4" fill="none" stroke="currentColor" stroke-width="3"/><path d="M13 17h22" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            <div>
+              <h3>Zona de Bajas Emisiones de 27,8 km²</h3>
+              <p>Una única zona delimitada por la Ronda Nord, Tarongers, Serrería y el Bulevard Sud, vigilada por 278 cámaras. Los vecinos de la ciudad no se ven afectados hasta el 1 de enero de 2028.</p>
+            </div>
+          </li>
+          <li class="hecho">
+            <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><path d="M24 43s13-12 13-23a13 13 0 0 0-26 0c0 11 13 23 13 23Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M19 20h10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+            <div>
+              <h3>8 medias oficiales para toda la ciudad</h3>
+              <p>El informe oficial de 2024 da la media anual de NO₂ de solo 8 estaciones en València. Nadie sabe cómo es el aire en su calle ni en la puerta de su colegio.</p>
+            </div>
+          </li>
+        </ul>
+
+        <!-- Comparativa visual: cada punto es una estación oficial -->
+        <div class="veredicto" aria-labelledby="titulo-veredicto">
+          <h3 id="titulo-veredicto" class="veredicto__titulo">Las estaciones de València en 2024, frente a tres listones</h3>
+          <p class="veredicto__ayuda">Cada círculo es una estación oficial: <span class="clave clave--cumple" aria-hidden="true"></span> por debajo del límite, <span class="clave clave--justo" aria-hidden="true"></span> justo en el límite, <span class="clave clave--supera" aria-hidden="true"></span> lo supera.</p>
+
+          <div class="veredicto__rejilla">
+            <article class="liston liston--hoy">
+              <h4>Hoy</h4>
+              <p class="liston__norma">Límite legal vigente de la UE</p>
+              <div class="liston__fila">
+                <span class="liston__contaminante">NO₂ · 40 µg/m³</span>
+                <span class="puntos" data-contaminante="no2" data-limite="40"></span>
+                <span class="liston__cuenta" data-cuenta="no2-40"></span>
+              </div>
+              <div class="liston__fila">
+                <span class="liston__contaminante">PM2.5 · 25 µg/m³</span>
+                <span class="puntos" data-contaminante="pm25" data-limite="25"></span>
+                <span class="liston__cuenta" data-cuenta="pm25-25"></span>
+              </div>
+              <p class="liston__frase">Cumplimos.</p>
+            </article>
+
+            <article class="liston liston--2030">
+              <h4>2030</h4>
+              <p class="liston__norma">Nueva directiva europea (UE) 2024/2881</p>
+              <div class="liston__fila">
+                <span class="liston__contaminante">NO₂ · 20 µg/m³</span>
+                <span class="puntos" data-contaminante="no2" data-limite="20"></span>
+                <span class="liston__cuenta" data-cuenta="no2-20"></span>
+              </div>
+              <div class="liston__fila">
+                <span class="liston__contaminante">PM2.5 · 10 µg/m³</span>
+                <span class="puntos" data-contaminante="pm25" data-limite="10"></span>
+                <span class="liston__cuenta" data-cuenta="pm25-10"></span>
+              </div>
+              <p class="liston__frase">No cumplimos.</p>
+            </article>
+
+            <article class="liston liston--oms">
+              <h4>Salud</h4>
+              <p class="liston__norma">Recomendación de la OMS (2021)</p>
+              <div class="liston__fila">
+                <span class="liston__contaminante">NO₂ · 10 µg/m³</span>
+                <span class="puntos" data-contaminante="no2" data-limite="10"></span>
+                <span class="liston__cuenta" data-cuenta="no2-10"></span>
+              </div>
+              <div class="liston__fila">
+                <span class="liston__contaminante">PM2.5 · 5 µg/m³</span>
+                <span class="puntos" data-contaminante="pm25" data-limite="5"></span>
+                <span class="liston__cuenta" data-cuenta="pm25-5"></span>
+              </div>
+              <p class="liston__frase">Lejos.</p>
+            </article>
+          </div>
+          <p class="nota">Medias anuales de 2024 (µg/m³). Bulevard Sud no mide PM2.5, por eso hay 8 estaciones de NO₂ y 7 de PM2.5. Fuente: Generalitat Valenciana, Evaluación de la Calidad del Aire 2024.</p>
+        </div>
+
+        <!-- Ilustración propia: una calle de València con los sensores de Respira VLC -->
+        <figure class="ilustracion-calle">
+          <svg viewBox="0 0 960 300" role="img" aria-labelledby="titulo-calle desc-calle">
+            <title id="titulo-calle">Ilustración de una calle con sensores Respira VLC</title>
+            <desc id="desc-calle">Una calle de una ciudad mediterránea con el mar al fondo. Hay un sensor en una farola con panel solar, otro en la puerta de un colegio, otro en un autobús y otro en una bici. Todos envían datos por radio.</desc>
+            <!-- Mar y cielo -->
+            <rect class="il-cielo" x="0" y="0" width="960" height="300"/>
+            <path class="il-mar" d="M0 170h960v40H0z"/>
+            <path class="il-ola" d="M600 182c20-8 40-8 60 0s40 8 60 0 40-8 60 0 40 8 60 0 40-8 60 0" fill="none" stroke-width="3" stroke-linecap="round"/>
+            <!-- Edificios -->
+            <g class="il-edificio">
+              <rect x="40" y="90" width="120" height="150"/>
+              <rect x="170" y="60" width="90" height="180"/>
+              <rect x="270" y="110" width="140" height="130"/>
+              <!-- Torre de campanario (genérica) -->
+              <rect x="430" y="40" width="40" height="200"/>
+              <path d="M425 40h50l-25-24z"/>
+            </g>
+            <g class="il-ventana">
+              <rect x="60" y="110" width="22" height="30" rx="3"/><rect x="100" y="110" width="22" height="30" rx="3"/>
+              <rect x="60" y="160" width="22" height="30" rx="3"/><rect x="100" y="160" width="22" height="30" rx="3"/>
+              <rect x="190" y="80" width="20" height="28" rx="3"/><rect x="225" y="80" width="20" height="28" rx="3"/>
+              <rect x="190" y="125" width="20" height="28" rx="3"/><rect x="225" y="125" width="20" height="28" rx="3"/>
+              <rect x="290" y="130" width="100" height="40" rx="4"/>
+              <rect x="442" y="70" width="16" height="26" rx="8"/>
+            </g>
+            <!-- Rótulo del colegio -->
+            <rect class="il-rotulo" x="295" y="186" width="90" height="22" rx="4"/>
+            <text class="il-texto-rotulo" x="340" y="202" text-anchor="middle">COLEGIO</text>
+            <!-- Calle -->
+            <rect class="il-calle" x="0" y="240" width="960" height="60"/>
+            <path class="il-linea" d="M20 270h60M120 270h60M220 270h60M320 270h60M420 270h60M520 270h60M620 270h60M720 270h60M820 270h60" stroke-width="4"/>
+            <!-- Palmera -->
+            <path class="il-tronco" d="M540 240c4-40 2-70-6-100" fill="none" stroke-width="8" stroke-linecap="round"/>
+            <path class="il-hoja" d="M534 140c-30-6-50 6-60 20 22-8 40-10 60-20Zm0 0c26-14 50-8 62 4-22-2-42 0-62-4Zm0 0c-14-24-6-40 6-50-2 18-2 34-6 50Zm0 0c18-18 40-20 54-14-20 4-36 8-54 14Z"/>
+            <!-- Farola con nodo solar -->
+            <path class="il-farola" d="M640 240V100h40" fill="none" stroke-width="6" stroke-linecap="round"/>
+            <rect class="il-panel" x="610" y="86" width="44" height="12" rx="2" transform="rotate(-15 632 92)"/>
+            <rect class="il-sensor" x="646" y="140" width="22" height="26" rx="5"/>
+            <!-- Sensor exterior del colegio -->
+            <rect class="il-sensor" x="390" y="200" width="18" height="22" rx="4"/>
+            <!-- Autobús -->
+            <g transform="translate(700 196)">
+              <rect class="il-bus" x="0" y="0" width="200" height="56" rx="10"/>
+              <rect class="il-ventana-bus" x="14" y="10" width="160" height="20" rx="4"/>
+              <circle class="il-rueda" cx="40" cy="58" r="12"/><circle class="il-rueda" cx="160" cy="58" r="12"/>
+              <rect class="il-sensor" x="180" y="-14" width="18" height="16" rx="4"/>
+            </g>
+            <!-- Bici -->
+            <g transform="translate(150 230)" class="il-bici" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="0" cy="30" r="18"/><circle cx="70" cy="30" r="18"/>
+              <path d="M0 30 25 0h30l15 30M25 0l10 30h-35M55 0l-5-10h-12"/>
+            </g>
+            <rect class="il-sensor" x="190" y="214" width="16" height="14" rx="4"/>
+            <!-- Ondas de radio LoRaWAN -->
+            <g class="il-ondas" fill="none" stroke-width="3" stroke-linecap="round">
+              <path d="M676 136a14 14 0 0 1 0 20M684 128a26 26 0 0 1 0 36"/>
+              <path d="M412 202a10 10 0 0 1 0 16M419 196a20 20 0 0 1 0 28"/>
+              <path d="M900 176a12 12 0 0 1 8 14M906 166a24 24 0 0 1 14 26"/>
+              <path d="M210 208a10 10 0 0 1 0 14"/>
+            </g>
+          </svg>
+          <figcaption>Ilustración propia: los sensores de Respira VLC en una farola, en la puerta de un colegio, en un autobús y en una bici.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ===================== 3. VÍDEOS ===================== -->
+    <section class="seccion seccion--tinte" id="videos" aria-labelledby="titulo-videos">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">02 / EL AIRE IMPORTA</p>
+        <h2 id="titulo-videos">Por qué importa el aire que respiramos</h2>
+        <p class="entradilla">Dos vídeos de la campaña BreatheLife de la Organización Mundial de la Salud. El vídeo solo se carga al pulsar el botón de reproducir, y se reproduce desde youtube-nocookie.com.</p>
+        <p class="aviso-red" id="aviso-videos" hidden>Los vídeos necesitan conexión a Internet. Cuando vuelva la conexión, recarga la página o pulsa en el vídeo.</p>
+
+        <div class="videos">
+          <!-- Fachada de vídeo: miniatura + botón. Al hacer clic, main.js crea el iframe -->
+          <figure class="video">
+            <button class="video__fachada" type="button" data-video-id="vdhDnYdBDhQ" data-video-titulo="OMS: Respira la Vida - Cómo la contaminación del aire afecta a tu cuerpo" aria-label="Reproducir vídeo: Cómo la contaminación del aire afecta a tu cuerpo">
+              <img src="https://i.ytimg.com/vi/vdhDnYdBDhQ/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+              <span class="video__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+            </button>
+            <figcaption><strong>Cómo la contaminación del aire afecta a tu cuerpo</strong><br>Organización Mundial de la Salud (OMS), en YouTube. En español.</figcaption>
+          </figure>
+          <figure class="video">
+            <button class="video__fachada" type="button" data-video-id="XYLCH-Oi8FE" data-video-titulo="OMS: Breathe life – El camino a casa" aria-label="Reproducir vídeo: El camino a casa">
+              <img src="https://i.ytimg.com/vi/XYLCH-Oi8FE/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
+              <span class="video__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+            </button>
+            <figcaption><strong>Breathe Life: El camino a casa</strong><br>Organización Mundial de la Salud (OMS), en YouTube. En español.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 4. CÓMO FUNCIONA ===================== -->
+    <section class="seccion" id="como-funciona" aria-labelledby="titulo-funciona">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">03 / DE LA CALLE A TU PANTALLA</p>
+        <h2 id="titulo-funciona">Una ciudad conectada.<br>Calle a calle.</h2>
+        <p class="entradilla">Los nodos fijos miden siempre en el mismo sitio. Los sensores móviles van en autobuses de la EMT y bicis Valenbisi y recorren la ciudad. Juntos dibujan un mapa vivo de la contaminación por calle y por hora.</p>
+
+        <div class="viaje" id="viaje">
+          <div class="viaje-stage" id="viaje-stage" data-etapa="1">
+            <div class="viaje-stage__cabecera"><span>RESPIRA / CITY EXPLORER</span><span>CONCEPTO</span></div>
+            <div class="viaje-mundo">
+              <img src="img/ciudad-respira.png" width="1536" height="1024" loading="lazy" decoding="async" alt="Maqueta conceptual de un barrio mediterráneo con un colegio, autobús, carril bici, árboles y sensores de aire.">
+              <svg class="viaje-red" viewBox="0 0 1000 667" aria-hidden="true"><g class="viaje-red__lineas"><path d="M438 327Q330 110 610 205"/><path d="M300 405Q490 160 610 205"/><path d="M745 430Q800 200 610 205"/><path d="M705 240Q670 100 610 205"/></g><g class="viaje-red__nodos"><circle cx="438" cy="327" r="7"/><circle cx="300" cy="405" r="7"/><circle cx="745" cy="430" r="7"/><circle cx="705" cy="240" r="7"/></g><g class="viaje-red__hub"><circle cx="610" cy="205" r="27"/><circle cx="610" cy="205" r="14"/><path d="m603 205 5 5 10-11"/></g></svg>
+              <div class="viaje-pulso viaje-pulso--1" aria-hidden="true"></div><div class="viaje-pulso viaje-pulso--2" aria-hidden="true"></div><div class="viaje-pulso viaje-pulso--3" aria-hidden="true"></div>
+              <div class="viaje-panel" aria-hidden="true"><span>DEL DATO A LA DECISIÓN</span><strong>Una visión<br>compartida.</strong><div class="viaje-panel__barras"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>APP · PANEL · DATOS ABIERTOS</small></div>
+            </div>
+            <div class="viaje-stage__pie"><span id="viaje-titulo">01 / Sentir la calle</span><span class="viaje-stage__indicio">SIGUE BAJANDO ↓</span></div>
+            <div class="viaje-stage__progreso" aria-hidden="true"><i id="viaje-progreso"></i></div>
+            <nav class="viaje-indice" aria-label="Etapas del proyecto"><a href="#viaje-1" aria-label="Etapa 1: Medir" aria-current="step">01</a><a href="#viaje-2" aria-label="Etapa 2: Conectar">02</a><a href="#viaje-3" aria-label="Etapa 3: Entender">03</a><a href="#viaje-4" aria-label="Etapa 4: Actuar">04</a></nav>
+            <p class="viaje-stage__nota">Ilustración conceptual generada con IA. Red propuesta, todavía no desplegada.</p>
+          </div>
+          <div class="viaje-relato">
+            <article class="viaje-paso viaje-paso--activo" id="viaje-1" data-etapa="1"><span>01 — MEDIR</span><h3>Lo invisible<br>se vuelve dato.</h3><p>Sensores en colegios, farolas, autobuses y bicis. Puntos fijos y móviles para observar la ciudad desde la calle.</p><div class="viaje-paso__chips"><span>NO₂</span><span>PM2.5</span><span>CO₂ en aulas</span></div></article>
+            <article class="viaje-paso" id="viaje-2" data-etapa="2"><span>02 — CONECTAR</span><h3>Cada punto.<br>Una misma red.</h3><p>Las medidas viajan por LoRaWAN, una conexión de largo alcance y bajo consumo. La ciudad empieza a compartir lo que sabe.</p><div class="viaje-paso__chips"><span>LoRaWAN</span><span>Bajo consumo</span></div></article>
+            <article class="viaje-paso" id="viaje-3" data-etapa="3"><span>03 — ENTENDER</span><h3>Los números<br>cuentan algo.</h3><p>La propuesta calibra los sensores con las estaciones oficiales y cruza sus medidas con el tráfico y la meteorología para anticipar cambios.</p><div class="viaje-paso__chips"><span>Calibración</span><span>Nube + IA</span></div></article>
+            <article class="viaje-paso" id="viaje-4" data-etapa="4"><span>04 — ACTUAR</span><h3>Más información.<br>Mejores decisiones.</h3><p>Una app ciudadana, un panel municipal y datos abiertos. Información para planificar rutas, emitir avisos y decidir dónde actuar.</p><a href="#mapa">Ahora, explora el mapa real <span aria-hidden="true">↗</span></a></article>
+          </div>
+        </div>
+
+        <details class="esquema-tecnico"><summary>Ver el esquema técnico completo <span aria-hidden="true">＋</span></summary>
+        <!-- Diagrama de flujo propio en SVG. -->
+        <figure class="diagrama">
+          <svg class="diagrama__ancho" viewBox="0 0 1000 330" role="img" aria-labelledby="titulo-flujo desc-flujo">
+            <title id="titulo-flujo">Flujo de datos de Respira VLC</title>
+            <desc id="desc-flujo">Los sensores envían sus medidas por LoRaWAN a la nube. Allí una IA las calibra con las estaciones oficiales, las cruza con tráfico y meteorología y predice las próximas 24 horas. El resultado llega a la app, al panel municipal y a los datos abiertos.</desc>
+            <defs>
+              <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" class="dg-punta"/></marker>
+            </defs>
+            <!-- Caja 1: sensores -->
+            <g>
+              <rect class="dg-caja" x="10" y="95" width="200" height="140" rx="14"/>
+              <text class="dg-titulo" x="110" y="135" text-anchor="middle">1. Sensores</text>
+              <text class="dg-texto" x="110" y="162" text-anchor="middle">Farolas, colegios,</text>
+              <text class="dg-texto" x="110" y="182" text-anchor="middle">autobuses EMT y</text>
+              <text class="dg-texto" x="110" y="202" text-anchor="middle">bicis Valenbisi</text>
+            </g>
+            <!-- Caja 2: LoRaWAN -->
+            <g>
+              <rect class="dg-caja" x="270" y="95" width="180" height="140" rx="14"/>
+              <text class="dg-titulo" x="360" y="135" text-anchor="middle">2. LoRaWAN</text>
+              <text class="dg-texto" x="360" y="162" text-anchor="middle">Radio de largo</text>
+              <text class="dg-texto" x="360" y="182" text-anchor="middle">alcance y muy</text>
+              <text class="dg-texto" x="360" y="202" text-anchor="middle">bajo consumo</text>
+            </g>
+            <!-- Caja 3: nube + IA -->
+            <g>
+              <rect class="dg-caja dg-caja--ia" x="510" y="75" width="220" height="180" rx="14"/>
+              <text class="dg-titulo" x="620" y="115" text-anchor="middle">3. Nube + IA</text>
+              <text class="dg-texto" x="620" y="145" text-anchor="middle">Calibra con las</text>
+              <text class="dg-texto" x="620" y="165" text-anchor="middle">estaciones oficiales,</text>
+              <text class="dg-texto" x="620" y="185" text-anchor="middle">cruza tráfico y tiempo</text>
+              <text class="dg-texto" x="620" y="205" text-anchor="middle">y predice las</text>
+              <text class="dg-texto" x="620" y="225" text-anchor="middle">próximas 24 h</text>
+            </g>
+            <!-- Salidas -->
+            <g>
+              <rect class="dg-caja dg-caja--salida" x="790" y="20" width="200" height="74" rx="14"/>
+              <text class="dg-titulo" x="890" y="52" text-anchor="middle">App ciudadana</text>
+              <text class="dg-texto" x="890" y="76" text-anchor="middle">Mapa, alertas, rutas</text>
+              <rect class="dg-caja dg-caja--salida" x="790" y="128" width="200" height="74" rx="14"/>
+              <text class="dg-titulo" x="890" y="160" text-anchor="middle">Panel municipal</text>
+              <text class="dg-texto" x="890" y="184" text-anchor="middle">ZBE, árboles, avisos</text>
+              <rect class="dg-caja dg-caja--salida" x="790" y="236" width="200" height="74" rx="14"/>
+              <text class="dg-titulo" x="890" y="268" text-anchor="middle">Datos abiertos</text>
+              <text class="dg-texto" x="890" y="292" text-anchor="middle">Para quien los quiera usar</text>
+            </g>
+            <!-- Flechas -->
+            <g class="dg-flecha" fill="none" stroke-width="3" marker-end="url(#flecha)">
+              <path d="M212 165h52"/>
+              <path d="M452 165h52"/>
+              <path d="M732 140C760 120 760 60 786 58"/>
+              <path d="M732 165h52"/>
+              <path d="M732 190C760 210 760 270 786 272"/>
+            </g>
+          </svg>
+
+          <svg class="diagrama__estrecho" viewBox="0 0 320 640" role="img" aria-labelledby="titulo-flujo-m">
+            <title id="titulo-flujo-m">Flujo de datos de Respira VLC: sensores, LoRaWAN, nube con IA y salidas (app, panel municipal y datos abiertos)</title>
+            <defs>
+              <marker id="flecha-m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" class="dg-punta"/></marker>
+            </defs>
+            <rect class="dg-caja" x="20" y="10" width="280" height="90" rx="14"/>
+            <text class="dg-titulo" x="160" y="45" text-anchor="middle">1. Sensores</text>
+            <text class="dg-texto" x="160" y="72" text-anchor="middle">Farolas, colegios, EMT, Valenbisi</text>
+            <rect class="dg-caja" x="20" y="140" width="280" height="90" rx="14"/>
+            <text class="dg-titulo" x="160" y="175" text-anchor="middle">2. LoRaWAN</text>
+            <text class="dg-texto" x="160" y="202" text-anchor="middle">Radio de largo alcance</text>
+            <rect class="dg-caja dg-caja--ia" x="20" y="270" width="280" height="110" rx="14"/>
+            <text class="dg-titulo" x="160" y="305" text-anchor="middle">3. Nube + IA</text>
+            <text class="dg-texto" x="160" y="332" text-anchor="middle">Calibra, cruza tráfico y tiempo</text>
+            <text class="dg-texto" x="160" y="354" text-anchor="middle">y predice las próximas 24 h</text>
+            <rect class="dg-caja dg-caja--salida" x="20" y="420" width="280" height="60" rx="14"/>
+            <text class="dg-titulo" x="160" y="456" text-anchor="middle">App ciudadana</text>
+            <rect class="dg-caja dg-caja--salida" x="20" y="495" width="280" height="60" rx="14"/>
+            <text class="dg-titulo" x="160" y="531" text-anchor="middle">Panel municipal</text>
+            <rect class="dg-caja dg-caja--salida" x="20" y="570" width="280" height="60" rx="14"/>
+            <text class="dg-titulo" x="160" y="606" text-anchor="middle">Datos abiertos</text>
+            <g class="dg-flecha" fill="none" stroke-width="3" marker-end="url(#flecha-m)">
+              <path d="M160 102v32"/><path d="M160 232v32"/><path d="M160 382v32"/>
+            </g>
+          </svg>
+        </figure>
+
+        </details>
+
+        <ul class="principios">
+          <li><strong>Sin cámaras ni datos personales.</strong> Los sensores solo miden gases y partículas.</li>
+          <li><strong>Complementa, no sustituye.</strong> Los sensores se calibran contra las estaciones oficiales de la Generalitat.</li>
+          <li><strong>Datos abiertos.</strong> El Ayuntamiento puede decidir dónde aplicar la ZBE, dónde plantar árboles o cuándo activar avisos.</li>
+        </ul>
+
+        <h3 class="subtitulo">Fichas técnicas</h3>
+        <div class="fichas">
+          <article class="ficha">
+            <h4>Nodo de farola</h4>
+            <dl>
+              <dt>Placa</dt><dd>ESP32</dd>
+              <dt>Mide</dt><dd>Partículas PM2.5 y NO₂ (sensor electroquímico)</dd>
+              <dt>Comunicación</dt><dd>LoRaWAN</dd>
+              <dt>Energía</dt><dd>Panel solar propio</dd>
+              <dt>Dónde</dt><dd>Farolas y puertas de colegios</dd>
+            </dl>
+          </article>
+          <article class="ficha">
+            <h4>Sensor móvil</h4>
+            <dl>
+              <dt>Placa</dt><dd>ESP32 con GPS</dd>
+              <dt>Mide</dt><dd>PM2.5 y NO₂ mientras circula</dd>
+              <dt>Comunicación</dt><dd>LoRaWAN</dd>
+              <dt>Energía</dt><dd>Del autobús o batería propia en la bici</dd>
+              <dt>Dónde</dt><dd>Autobuses de la EMT y bicis Valenbisi</dd>
+            </dl>
+          </article>
+          <article class="ficha">
+            <h4>Sensor de aula</h4>
+            <dl>
+              <dt>Placa</dt><dd>ESP32</dd>
+              <dt>Mide</dt><dd>CO₂ y PM2.5 en interior</dd>
+              <dt>Aviso</dt><dd>Semáforo LED: verde, ámbar o rojo para ventilar</dd>
+              <dt>Comunicación</dt><dd>Wifi del centro o LoRaWAN</dd>
+              <dt>Dónde</dt><dd>Aulas y oficinas</dd>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 5. MAPA ===================== -->
+    <section class="seccion seccion--tinte" id="mapa" aria-labelledby="titulo-mapa">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">04 / UNA MIRADA A VALÈNCIA</p>
+        <h2 id="titulo-mapa">Ocho medias oficiales para una ciudad entera</h2>
+        <p class="entradilla">Los círculos con número son las estaciones con media oficial de NO₂ en 2024 (µg/m³). Los círculos grises son otras estaciones municipales que no tienen media en el informe de 2024. Los rombos verdes son nodos Respira cerca de colegios: son una <strong>propuesta</strong>, todavía no existen.</p>
+
+        <div class="mapa-envoltorio">
+          <div id="mapa-leaflet" class="mapa" role="region" aria-label="Mapa de València con estaciones oficiales y nodos propuestos"></div>
+          <aside class="mapa-leyenda" aria-label="Leyenda del mapa">
+            <h3>Leyenda</h3>
+            <ul>
+              <li><span class="ley ley--bajo" aria-hidden="true"></span> NO₂ por debajo de 20 µg/m³ (límite UE 2030)</li>
+              <li><span class="ley ley--limite" aria-hidden="true"></span> NO₂ justo en 20 µg/m³</li>
+              <li><span class="ley ley--alto" aria-hidden="true"></span> NO₂ por encima de 20 µg/m³</li>
+              <li><span class="ley ley--sin" aria-hidden="true"></span> Estación municipal sin media en el informe 2024</li>
+              <li><span class="ley ley--propuesto" aria-hidden="true"></span> Nodo Respira propuesto (ubicación ilustrativa)</li>
+            </ul>
+            <p class="nota">Ubicación de las estaciones: geoportal de datos abiertos del Ajuntament de València. Pulsa un punto para ver más.</p>
+          </aside>
+        </div>
+        <p class="aviso-red" id="aviso-mapa" hidden>No se ha podido cargar el mapa. Los datos de las estaciones están en la sección siguiente.</p>
+        <p class="aviso-red" id="aviso-teselas" hidden>Sin conexión a Internet no se ve el fondo del mapa (calles de OpenStreetMap), pero los puntos y sus datos sí funcionan.</p>
+      </div>
+    </section>
+
+    <!-- ===================== 6. DATOS ===================== -->
+    <section class="seccion" id="datos" aria-labelledby="titulo-datos">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">05 / DATOS, NO SUPOSICIONES</p>
+        <h2 id="titulo-datos">Los datos de 2024, estación por estación</h2>
+        <p class="entradilla">Medias anuales oficiales de dióxido de nitrógeno (NO₂) y partículas finas (PM2.5) en las estaciones de València. La página lee el archivo <code>data/aire_2024.json</code>, que preparamos con pandas.</p>
+
+        <!-- Tarjetas KPI: los valores se calculan en js/datos.js a partir del JSON -->
+        <div class="kpis" id="kpis" aria-live="polite">
+          <div class="kpi">
+            <p class="kpi__etiqueta">NO₂ medio de las 8 estaciones</p>
+            <p class="kpi__valor"><span data-kpi="no2-media">–</span> <small>µg/m³</small></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__etiqueta">NO₂ máximo</p>
+            <p class="kpi__valor"><span data-kpi="no2-max">–</span> <small>µg/m³</small></p>
+            <p class="kpi__detalle" data-kpi="no2-max-est"></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__etiqueta">NO₂ mínimo</p>
+            <p class="kpi__valor"><span data-kpi="no2-min">–</span> <small>µg/m³</small></p>
+            <p class="kpi__detalle" data-kpi="no2-min-est"></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__etiqueta">PM2.5 medio de las 7 estaciones</p>
+            <p class="kpi__valor"><span data-kpi="pm25-media">–</span> <small>µg/m³</small></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__etiqueta">PM2.5 máximo</p>
+            <p class="kpi__valor"><span data-kpi="pm25-max">–</span> <small>µg/m³</small></p>
+            <p class="kpi__detalle" data-kpi="pm25-max-est"></p>
+          </div>
+          <div class="kpi">
+            <p class="kpi__etiqueta">PM2.5 mínimo</p>
+            <p class="kpi__valor"><span data-kpi="pm25-min">–</span> <small>µg/m³</small></p>
+            <p class="kpi__detalle" data-kpi="pm25-min-est"></p>
+          </div>
+        </div>
+
+        <div class="graficas">
+          <figure class="grafica">
+            <figcaption>
+              <h3>NO₂: media anual por estación</h3>
+              <p>µg/m³, de menor a mayor. Las líneas verticales marcan los tres listones.</p>
+            </figcaption>
+            <div class="grafica__leyenda" id="leyenda-no2"></div>
+            <div class="grafica__lienzo"><canvas id="grafica-no2" role="img" aria-label="Gráfico de barras del NO₂ medio anual de 2024 por estación, con las referencias UE actual 40, UE 2030 20 y OMS 10 µg/m³"></canvas></div>
+          </figure>
+
+          <figure class="grafica">
+            <figcaption>
+              <h3>PM2.5: media anual por estación</h3>
+              <p>µg/m³, de menor a mayor. Bulevard Sud no mide PM2.5.</p>
+            </figcaption>
+            <div class="grafica__leyenda" id="leyenda-pm25"></div>
+            <div class="grafica__lienzo"><canvas id="grafica-pm25" role="img" aria-label="Gráfico de barras del PM2.5 medio anual de 2024 por estación, con las referencias UE actual 25, UE 2030 10 y OMS 5 µg/m³"></canvas></div>
+          </figure>
+
+          <!-- Serie de años: data/no2_evolucion.json (generado con pandas a partir de los datos horarios del Ayuntamiento) -->
+          <figure class="grafica" id="bloque-evolucion" hidden>
+            <figcaption>
+              <h3>El NO₂ baja… pero no basta</h3>
+              <p>µg/m³, media de 5 estaciones que midieron todos los años (Av. França, Bulevard Sud, Pista de Silla, Politècnic y Vivers), 2016-2022.</p>
+            </figcaption>
+            <div class="grafica__lienzo"><canvas id="grafica-evolucion" role="img" aria-label="Gráfico de líneas: el NO₂ medio de 5 estaciones baja de 29,8 µg/m³ en 2016 a 16,0 en 2022"></canvas></div>
+          </figure>
+
+          <!-- Perfil por horas: data/no2_por_hora.json (pandas, groupby por hora del día) -->
+          <figure class="grafica" id="bloque-horas" hidden>
+            <figcaption>
+              <h3>A las 7:00 se respira peor</h3>
+              <p>µg/m³, NO₂ medio por hora del día en 2022, todas las estaciones. En naranja, las horas por encima de 20.</p>
+            </figcaption>
+            <div class="grafica__lienzo"><canvas id="grafica-horas" role="img" aria-label="Gráfico de barras del NO₂ medio por hora del día en 2022: máximo a las 7:00 con 31,2 µg/m³ y mínimo a las 3:00 con 12,6"></canvas></div>
+          </figure>
+        </div>
+        <p class="nota">Las dos gráficas de arriba usan los datos horarios del portal de datos abiertos del Ajuntament de València; las de 2024, el informe anual validado de la Generalitat. Por eso no se mezclan en la misma gráfica.</p>
+
+        <details class="tabla-datos">
+          <summary>Ver la tabla con todos los datos</summary>
+          <div class="tabla-scroll">
+            <table>
+              <caption>Medias anuales 2024 por estación (µg/m³)</caption>
+              <thead><tr><th scope="col">Estación</th><th scope="col">NO₂</th><th scope="col">PM2.5</th><th scope="col">Horas con NO₂ &gt; 200</th><th scope="col">Datos válidos NO₂</th></tr></thead>
+              <tbody id="tabla-cuerpo"></tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="explicaciones">
+          <article>
+            <h3>¿Qué representa el gráfico?</h3>
+            <p>Cada barra es la concentración media de todo 2024 en una estación oficial. Las barras naranjas superan el límite de 2030 y las de naranja claro están justo en él. Si solo miramos la línea de 40 µg/m³ (NO₂) o la de 25 µg/m³ (PM2.5), toda la ciudad aprueba. Con los límites de la nueva directiva, que se aplican desde 2030, Olivereta supera el de NO₂ y Centre se queda justo en 20 µg/m³. En PM2.5 superan el límite 4 de las 7 estaciones, y Av. França y Molí del Sol se quedan justo en 10 µg/m³. Con la recomendación de la OMS, que es el listón de salud, no aprueba ninguna.</p>
+          </article>
+          <article>
+            <h3>¿Cómo ayuda Respira VLC?</h3>
+            <p>Una media anual de 8 puntos no dice qué pasa en cada calle ni a cada hora, y los datos demuestran que el aire cambia mucho: Olivereta tiene casi el triple de NO₂ que Politècnic, y a las 7:00 hay 2,5 veces más NO₂ que a las 3:00. Respira VLC añade cientos de puntos de medida calibrados con estas mismas estaciones. Así el Ayuntamiento puede ver dónde se acumula el NO₂, comprobar si la ZBE funciona calle a calle y llegar a 2030 sabiendo dónde actuar primero. Las familias pueden ver el aire en la puerta del colegio de sus hijos, justo a la hora de entrar.</p>
+          </article>
+        </div>
+
+        <!-- ===== Análisis con pandas: las operaciones del notebook, con sus resultados ===== -->
+        <div class="pandas" id="analisis" aria-labelledby="titulo-pandas">
+          <h3 id="titulo-pandas" class="subtitulo">Así lo hemos analizado con pandas</h3>
+          <p class="pandas__intro">Cada tarjeta es una operación de nuestro notebook <code>datos/analisis_aire_valencia.ipynb</code>, con el resultado que da. Los resultados de esta página se calculan con el mismo archivo de datos.</p>
+          <ol class="pandas__lista">
+            <li class="operacion">
+              <p class="operacion__que">Cargar los datos</p>
+              <pre><code>df = pd.read_csv("aire_valencia_2024.csv")</code></pre>
+              <p class="operacion__res"><strong data-pandas="filas">8</strong> estaciones, 2 contaminantes</p>
+            </li>
+            <li class="operacion">
+              <p class="operacion__que">Media</p>
+              <pre><code>df["no2"].mean()</code></pre>
+              <p class="operacion__res"><strong data-pandas="media">17,8</strong> µg/m³ de NO₂</p>
+            </li>
+            <li class="operacion">
+              <p class="operacion__que">Máximo y dónde</p>
+              <pre><code>df.loc[df["no2"].idxmax()]</code></pre>
+              <p class="operacion__res"><strong data-pandas="max">30</strong> µg/m³ en <span data-pandas="max-est">Olivereta</span></p>
+            </li>
+            <li class="operacion">
+              <p class="operacion__que">Ordenar de menor a mayor</p>
+              <pre><code>df.sort_values("no2")</code></pre>
+              <p class="operacion__res" data-pandas="orden">Politècnic 11 → … → Olivereta 30</p>
+            </li>
+            <li class="operacion">
+              <p class="operacion__que">Filtrar: superan el límite 2030</p>
+              <pre><code>df[df["pm25"] &gt; 10]</code></pre>
+              <p class="operacion__res"><strong data-pandas="filtro-n">4 de 7</strong> en PM2.5: <span data-pandas="filtro-est">Politècnic, Vivers, Centre, Olivereta</span></p>
+            </li>
+            <li class="operacion">
+              <p class="operacion__que">Agrupar por tipo de zona</p>
+              <pre><code>df.groupby("tipo_zona")["no2"].mean()</code></pre>
+              <p class="operacion__res">Urbana <strong>19,2</strong> · Suburbana <strong>13,5</strong> µg/m³</p>
+            </li>
+            <li class="operacion">
+              <p class="operacion__que">Columna calculada</p>
+              <pre><code>df["veces_oms"] = df["no2"] / 10</code></pre>
+              <p class="operacion__res">Olivereta respira <strong>3 veces</strong> lo que recomienda la OMS</p>
+            </li>
+            <li class="operacion">
+              <p class="operacion__que">Agrupar 554.146 filas horarias por año</p>
+              <pre><code>horas.groupby("anio")["NO2"].mean()</code></pre>
+              <p class="operacion__res">De <strong>29,8</strong> (2016) a <strong>16,0</strong> (2022): <strong>−46 %</strong></p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- ===================== 8. CALCULADORA DE IMPACTO ===================== -->
+    <section class="seccion" id="calculadora" aria-labelledby="titulo-calculadora">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">06 / IMAGINA EL IMPACTO</p>
+        <h2 id="titulo-calculadora">Calcula tu red</h2>
+        <p class="entradilla">Elige cuántos colegios, farolas y vehículos quieres equipar y mira cuántos puntos de medida tendría la ciudad. Solo contamos lo que se mide; no calculamos cuánto bajaría la contaminación.</p>
+
+        <div class="calculadora">
+          <form class="calculadora__controles" id="calc" aria-label="Opciones de la calculadora">
+            <p class="red-presets__etiqueta">PRUEBA UN ESCENARIO ILUSTRATIVO</p>
+            <div class="red-presets"><button type="button" data-red="1,0,0" aria-pressed="false" disabled>Un colegio</button><button type="button" data-red="10,50,20" aria-pressed="false" disabled>Un barrio</button><button type="button" data-red="60,250,120" aria-pressed="false" disabled>A gran escala</button></div>
+            <div class="control">
+              <label for="c-colegios">Colegios con Respira Escola</label>
+              <div class="control__fila">
+                <input id="c-colegios" type="range" min="0" max="200" step="1" value="20">
+                <output for="c-colegios" id="o-colegios">20</output>
+              </div>
+            </div>
+            <div class="control">
+              <label for="c-farolas">Nodos de farola (lotes de 50, Respira Ciutat)</label>
+              <div class="control__fila">
+                <input id="c-farolas" type="range" min="0" max="500" step="50" value="50">
+                <output for="c-farolas" id="o-farolas">50</output>
+              </div>
+            </div>
+            <div class="control">
+              <label for="c-moviles">Autobuses y bicis con Respira Mòbil</label>
+              <div class="control__fila">
+                <input id="c-moviles" type="range" min="0" max="300" step="5" value="40">
+                <output for="c-moviles" id="o-moviles">40</output>
+              </div>
+            </div>
+          </form>
+
+          <div class="calculadora__vista">
+            <div class="red-visual">
+              <div class="red-visual__cabecera"><span>ESTÁS DIBUJANDO TU RED</span><strong><span id="red-visual-total">110</span><small>puntos exteriores propuestos</small></strong></div>
+              <svg viewBox="0 0 600 260" class="red-visual__plano" aria-hidden="true"><defs><pattern id="red-cuadricula" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#a4c5ab" stroke-opacity=".09"/></pattern></defs><rect width="600" height="260" fill="url(#red-cuadricula)"/><path d="M-20 160Q120 40 260 125T620 90" fill="none" stroke="#71a789" stroke-width="24" stroke-opacity=".09"/><g id="red-visual-nodos"></g></svg>
+              <p class="red-visual__escala" id="red-visual-escala">Cada punto representa un sensor exterior.</p>
+              <div class="red-visual__leyenda"><span><i class="red-colegio"></i>Colegios</span><span><i class="red-farola"></i>Farolas</span><span><i class="red-movil"></i>Vehículos</span></div>
+            </div>
+          <div class="calculadora__resultados" aria-live="polite">
+            <div class="resultado resultado--grande">
+              <p class="resultado__valor" id="r-veces">–</p>
+              <p class="resultado__texto">respecto a los 8 puntos oficiales de referencia (<span id="r-puntos">–</span> puntos exteriores propuestos)</p>
+            </div>
+            <div class="resultado">
+              <p class="resultado__valor" id="r-aulas">–</p>
+              <p class="resultado__texto">aulas con el aire medido</p>
+            </div>
+            <div class="resultado">
+              <p class="resultado__valor" id="r-alumnos">–</p>
+              <p class="resultado__texto">alumnos que respiran aire medido (25 por aula)</p>
+            </div>
+            <div class="resultado resultado--coste">
+              <p class="resultado__texto">Coste el primer año</p>
+              <p class="resultado__valor" id="r-coste">–</p>
+              <p class="resultado__texto" id="r-coste-detalle"></p>
+            </div>
+          </div>
+          </div>
+        </div>
+        <p class="nota">Puntos de medida exterior = 1 sensor en la puerta de cada colegio + cada nodo de farola + cada sensor móvil. Los sensores de aula miden el aire interior y no cuentan como puntos exteriores. Precios del catálogo; IVA no incluido.</p>
+      </div>
+    </section>
+
+    <!-- ===================== 9. EQUIPO ===================== -->
+    <section class="seccion seccion--tinte" id="equipo" aria-labelledby="titulo-equipo">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">07 / HECHO AQUÍ</p>
+        <h2 id="titulo-equipo">Quién hay detrás de Marinada Labs</h2>
+        <p class="entradilla">Marinada Labs toma su nombre de la marinada, la brisa que sube del mar por la tarde y limpia el aire de la ciudad. Somos un equipo de 2.º de ASIR.</p>
+        <div class="equipo">
+          <article class="persona">
+            <svg class="persona__avatar" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="40" class="av-fondo"/><text x="40" y="49" text-anchor="middle" class="av-iniciales">SM</text></svg>
+            <div>
+              <h3>Saul Martin</h3>
+              <p class="persona__papel">Datos y análisis con pandas</p>
+              <p>Ha buscado los datos oficiales, los ha analizado con pandas y ha sacado las conclusiones que relacionan los datos con el producto.</p>
+            </div>
+          </article>
+          <article class="persona">
+            <svg class="persona__avatar" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="40" class="av-fondo"/><text x="40" y="49" text-anchor="middle" class="av-iniciales">MS</text></svg>
+            <div>
+              <h3>Marcos Soria</h3>
+              <p class="persona__papel">Web, diseño y producto</p>
+              <p>Ha diseñado la web, los logotipos y el catálogo, y ha integrado las gráficas y el mapa.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== 10. FUENTES ===================== -->
+    <section class="seccion" id="fuentes" aria-labelledby="titulo-fuentes">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">08 / DETRÁS DE CADA CIFRA</p>
+        <h2 id="titulo-fuentes">Fuentes</h2>
+        <details class="fuentes-panel"><summary>Datos oficiales, normativa y recursos <span>Consultar las referencias ↗</span></summary>
+        <ul class="fuentes">
+          <li>Generalitat Valenciana, Red Valenciana de Vigilancia y Control de la Contaminación Atmosférica. <a href="https://rvvcca.pica.gva.es/sites/default/files/2026-02/II.%20RESUMEN%20PARAMETROS%20ECA%202024%20CAS.pdf">Evaluación de la Calidad del Aire 2024, resumen por parámetro (PDF)</a>. Datos de NO₂ y PM2.5 de la sección de datos.</li>
+          <li>Naciones Unidas. <a href="https://www.un.org/sustainabledevelopment/es/cities/">Objetivo 11: ciudades y comunidades sostenibles</a> (meta 11.6).</li>
+          <li>Ajuntament de València. <a href="https://www.valencia.es/cas/actualidad/-/content/capital-verda-europea-2024">València es capital verde europea 2024</a>.</li>
+          <li>Ajuntament de València. <a href="https://www.valencia.es/val/actualitat/-/content/moratoria-dana-val%C3%A8ncia-zona-bajas-emisiones">Zona de Bajas Emisiones: moratoria y calendario</a> (2 de enero de 2025).</li>
+          <li>Ajuntament de València. <a href="https://www.valencia.es/cas/actualidad/-/content/val%C3%A8ncia-aprueba-la-ordenanza-de-zona-de-bajas-emisiones">La Comisión de Patrimonio aprueba la ordenanza de Zona de Bajas Emisiones</a> (21 de octubre de 2025).</li>
+          <li>Unión Europea. <a href="https://eur-lex.europa.eu/eli/dir/2024/2881/oj?locale=es">Directiva (UE) 2024/2881 relativa a la calidad del aire ambiente</a>. Resumen de los nuevos límites en la <a href="https://miteco.gob.es/content/dam/miteco/es/calidad-y-evaluacion-ambiental/sgalsi/atm%C3%B3sfera-y-calidad-del-aire/infograf%C3%ADas-calidad-del-aire/Infografia%20DIRECTIVA%20WEB1.pdf">infografía del Ministerio para la Transición Ecológica (PDF)</a>.</li>
+          <li>Organización Mundial de la Salud. <a href="https://www.who.int/publications/i/item/9789240034228">Directrices mundiales sobre la calidad del aire (2021)</a>.</li>
+          <li>Ajuntament de València, portal de datos abiertos. <a href="https://opendata.vlci.valencia.es/dataset/hourly-air-quality-data-since-2016">Datos horarios de calidad del aire desde 2016</a> y <a href="https://opendata.vlci.valencia.es/dataset/rvvcca_d_horarios_2021-2022">Datos por horas calidad aire 2021-2022</a>. Gráficas de evolución 2016-2022 y de NO₂ por hora.</li>
+          <li>Ajuntament de València, portal de datos abiertos. <a href="https://opendata.vlci.valencia.es/dataset/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas">Estaciones contaminación atmosféricas</a> (ubicación y tipo de zona de cada estación, para el mapa).</li>
+          <li>Vídeos: Organización Mundial de la Salud, campaña BreatheLife, <a href="https://www.youtube.com/watch?v=vdhDnYdBDhQ">«Cómo la contaminación del aire afecta a tu cuerpo»</a> y <a href="https://www.youtube.com/watch?v=XYLCH-Oi8FE">«El camino a casa»</a>.</li>
+          <li>Mapa: <a href="https://www.openstreetmap.org/copyright">© colaboradores de OpenStreetMap</a>, con la biblioteca <a href="https://leafletjs.com/">Leaflet</a>. Gráficas con <a href="https://www.chartjs.org/">Chart.js</a>.</li>
+        </ul>
+        </details>
+      </div>
+    </section>
+    <!-- La elección de gama y el pedido cierran el recorrido. -->
+    <section class="seccion seccion--tinte" id="catalogo" aria-labelledby="titulo-catalogo">
+      <div class="contenedor">
+        <p class="seccion__etiqueta">09 / ELIGE CÓMO EMPEZAR</p>
+        <div class="catalogo__cabecera"><a class="boton-carrito" href="#pedido" aria-label="Ver tu pedido">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="17" cy="20" r="1.5" fill="currentColor"/></svg>
+          <span class="boton-carrito__num" id="contador-carrito">0</span>
+        </a></div>
+        <h2 id="titulo-catalogo">Ahora sí.<br>Elige tu gama.</h2>
+        <p class="entradilla">Cinco gamas para cinco escalas: desde la app gratuita hasta una red para toda la ciudad. Todo el hardware es abierto, barato y se calibra con las estaciones oficiales. Los precios no incluyen IVA; el pedido lo desglosa.</p>
+
+        <!-- Tarjetas de producto: de la gama más pequeña a la más grande.
+             Cada una lleva una ilustración propia en SVG (los colores salen de las variables CSS). -->
+        <ol class="catalogo" aria-label="Productos de Respira VLC">
+          <li class="producto" data-id="app">
+            <svg class="producto__dibujo" viewBox="0 0 120 80" aria-hidden="true"><rect x="42" y="6" width="36" height="68" rx="7" class="pd-borde"/><rect x="47" y="14" width="26" height="46" rx="2" class="pd-pantalla"/><circle cx="60" cy="34" r="9" class="pd-aro"/><path d="M52 52h16" class="pd-linea"/><circle cx="60" cy="67" r="2.5" class="pd-relleno"/></svg>
+            <h3 class="producto__nombre">App Respira VLC</h3>
+            <p class="producto__para">Para la ciudadanía</p>
+            <p class="producto__precio"><span class="precio">Gratis</span></p>
+            <ul class="producto__lista">
+              <li>Mapa del aire por barrio</li>
+              <li>Alertas para personas asmáticas y familias</li>
+              <li>Rutas en bici o andando por las calles menos contaminadas</li>
+            </ul>
+            <a class="boton boton--borde" href="#pedido" data-interes="App Respira VLC">Quiero la app</a>
+          </li>
+
+          <li class="producto" data-id="aula">
+            <svg class="producto__dibujo" viewBox="0 0 120 80" aria-hidden="true"><rect x="34" y="16" width="52" height="48" rx="10" class="pd-borde"/><circle cx="50" cy="40" r="5" class="pd-verde"/><circle cx="60" cy="40" r="5" class="pd-ambar"/><circle cx="70" cy="40" r="5" class="pd-rojo"/><path d="M44 54h32" class="pd-linea"/><path d="M90 30a10 10 0 0 1 0 20M96 24a18 18 0 0 1 0 32" class="pd-onda"/></svg>
+            <h3 class="producto__nombre">Respira Aula</h3>
+            <p class="producto__para">Para clases y oficinas</p>
+            <p class="producto__precio"><span class="precio">79 €</span> <span class="precio__unidad">por sensor</span></p>
+            <ul class="producto__lista">
+              <li>Sensor de CO₂ y PM2.5 de interior</li>
+              <li>Semáforo LED que avisa cuándo ventilar</li>
+            </ul>
+            <button class="boton boton--principal" type="button" data-anadir="aula">Añadir al pedido</button>
+          </li>
+
+          <li class="producto producto--recomendado" data-id="escola">
+            <p class="producto__sello">Recomendado</p>
+            <svg class="producto__dibujo" viewBox="0 0 120 80" aria-hidden="true"><path d="M20 70V34l40-22 40 22v36z" class="pd-borde"/><rect x="50" y="48" width="20" height="22" class="pd-pantalla"/><rect x="30" y="40" width="12" height="10" rx="2" class="pd-pantalla"/><rect x="78" y="40" width="12" height="10" rx="2" class="pd-pantalla"/><circle cx="60" cy="30" r="6" class="pd-relleno"/><rect x="74" y="56" width="10" height="10" rx="2" class="pd-sensor"/></svg>
+            <h3 class="producto__nombre">Respira Escola</h3>
+            <p class="producto__para">Para colegios</p>
+            <p class="producto__precio"><span class="precio">690 €</span> <span class="precio__unidad">por colegio</span></p>
+            <p class="producto__ahorro">Más barato que 10 Aula sueltos (790 €) y con sensor exterior incluido</p>
+            <ul class="producto__lista">
+              <li>10 sensores de aula con semáforo LED</li>
+              <li>1 sensor exterior en la puerta (PM2.5 y NO₂)</li>
+              <li>Panel para la dirección del centro</li>
+            </ul>
+            <button class="boton boton--principal" type="button" data-anadir="escola">Añadir al pedido</button>
+          </li>
+
+          <li class="producto" data-id="mobil">
+            <svg class="producto__dibujo" viewBox="0 0 120 80" aria-hidden="true"><rect x="12" y="26" width="92" height="36" rx="8" class="pd-borde"/><rect x="20" y="32" width="64" height="12" rx="2" class="pd-pantalla"/><circle cx="32" cy="64" r="7" class="pd-relleno"/><circle cx="84" cy="64" r="7" class="pd-relleno"/><rect x="88" y="16" width="12" height="10" rx="2" class="pd-sensor"/><path d="M104 14a8 8 0 0 1 4 10" class="pd-onda"/></svg>
+            <h3 class="producto__nombre">Respira Mòbil</h3>
+            <p class="producto__para">Para EMT y Valenbisi</p>
+            <p class="producto__precio"><span class="precio">249 €</span> <span class="precio__unidad">por unidad</span></p>
+            <ul class="producto__lista">
+              <li>Sensor para autobús o bici</li>
+              <li>Mide PM2.5 y NO₂ mientras circula</li>
+              <li>Posición GPS en cada medida</li>
+            </ul>
+            <button class="boton boton--principal" type="button" data-anadir="mobil">Añadir al pedido</button>
+          </li>
+
+          <li class="producto" data-id="ciutat">
+            <svg class="producto__dibujo" viewBox="0 0 120 80" aria-hidden="true"><path d="M30 76V20h22M78 76V20h22" class="pd-poste"/><rect x="20" y="12" width="20" height="6" rx="1" class="pd-panel" transform="rotate(-12 30 15)"/><rect x="68" y="12" width="20" height="6" rx="1" class="pd-panel" transform="rotate(-12 78 15)"/><rect x="40" y="36" width="12" height="14" rx="3" class="pd-sensor"/><rect x="88" y="36" width="12" height="14" rx="3" class="pd-sensor"/><path d="M56 40a8 8 0 0 1 0 10M104 40a8 8 0 0 1 0 10" class="pd-onda"/></svg>
+            <h3 class="producto__nombre">Respira Ciutat</h3>
+            <p class="producto__para">Para el Ayuntamiento</p>
+            <p class="producto__precio"><span class="precio">9.900 €</span> <span class="precio__unidad">+ 1.200 €/año</span></p>
+            <ul class="producto__lista">
+              <li>50 nodos solares para farolas</li>
+              <li>Plataforma con predicción a 24 h</li>
+              <li>Publicación como datos abiertos</li>
+            </ul>
+            <button class="boton boton--principal" type="button" data-anadir="ciutat">Añadir al pedido</button>
+          </li>
+        </ol>
+
+        <!-- Comparador de características entre gamas -->
+        <h3 class="subtitulo" id="titulo-comparador">Compara las gamas</h3>
+        <div class="tabla-scroll comparador-envoltorio" tabindex="0" role="region" aria-labelledby="titulo-comparador">
+          <table class="comparador">
+            <thead>
+              <tr>
+                <th scope="col">Característica</th>
+                <th scope="col">App</th>
+                <th scope="col">Aula</th>
+                <th scope="col" class="col-recomendada">Escola</th>
+                <th scope="col">Mòbil</th>
+                <th scope="col">Ciutat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- "s" = sí, "n" = no. main.js convierte cada celda en un icono con texto accesible -->
+              <tr><th scope="row">Mide PM2.5</th><td data-v="n"></td><td data-v="s"></td><td data-v="s" class="col-recomendada"></td><td data-v="s"></td><td data-v="s"></td></tr>
+              <tr><th scope="row">Mide NO₂</th><td data-v="n"></td><td data-v="n"></td><td data-v="s" class="col-recomendada"></td><td data-v="s"></td><td data-v="s"></td></tr>
+              <tr><th scope="row">Mide CO₂ en interior</th><td data-v="n"></td><td data-v="s"></td><td data-v="s" class="col-recomendada"></td><td data-v="n"></td><td data-v="n"></td></tr>
+              <tr><th scope="row">Semáforo LED para ventilar</th><td data-v="n"></td><td data-v="s"></td><td data-v="s" class="col-recomendada"></td><td data-v="n"></td><td data-v="n"></td></tr>
+              <tr><th scope="row">Mide en movimiento</th><td data-v="n"></td><td data-v="n"></td><td data-v="n" class="col-recomendada"></td><td data-v="s"></td><td data-v="n"></td></tr>
+              <tr><th scope="row">Panel solar</th><td data-v="n"></td><td data-v="n"></td><td data-v="n" class="col-recomendada"></td><td data-v="n"></td><td data-v="s"></td></tr>
+              <tr><th scope="row">Panel de gestión</th><td data-v="n"></td><td data-v="n"></td><td data-v="s" class="col-recomendada"></td><td data-v="s"></td><td data-v="s"></td></tr>
+              <tr><th scope="row">Predicción a 24 h</th><td data-v="s"></td><td data-v="n"></td><td data-v="s" class="col-recomendada"></td><td data-v="s"></td><td data-v="s"></td></tr>
+              <tr><th scope="row">Alimenta los datos abiertos</th><td data-v="n"></td><td data-v="n"></td><td data-v="s" class="col-recomendada"></td><td data-v="s"></td><td data-v="s"></td></tr>
+              <tr class="comparador__precio"><th scope="row">Precio sin IVA</th><td>Gratis</td><td>79 €</td><td class="col-recomendada">690 €</td><td>249 €/ud.</td><td>9.900 € + 1.200 €/año</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pedido: carrito a la izquierda, formulario a la derecha -->
+        <div class="pedido" id="pedido">
+          <div class="carrito" aria-labelledby="titulo-carrito">
+            <h3 id="titulo-carrito">Tu pedido</h3>
+            <p class="carrito__vacio" id="carrito-vacio">Todavía no has añadido nada. Elige una gama del catálogo con «Añadir al pedido».</p>
+            <ul class="carrito__lista" id="carrito-lista"></ul>
+            <dl class="carrito__totales" id="carrito-totales" hidden>
+              <dt>Base imponible</dt><dd id="total-base">0 €</dd>
+              <dt>IVA (21 %)</dt><dd id="total-iva">0 €</dd>
+              <dt class="carrito__total">Total</dt><dd class="carrito__total" id="total-final">0 €</dd>
+            </dl>
+            <p class="nota" id="nota-cuota" hidden>Respira Ciutat incluye en el total la cuota de plataforma del primer año (1.200 € por lote). Los años siguientes se facturan aparte.</p>
+            <button class="boton boton--texto" type="button" id="vaciar-carrito" hidden>Vaciar el pedido</button>
+          </div>
+
+          <form class="formulario" id="formulario" novalidate aria-labelledby="titulo-formulario">
+            <h3 id="titulo-formulario">Solicita el pedido o pide información</h3>
+            <p class="formulario__aviso"><strong>Formulario de demostración.</strong> Es un proyecto escolar: al enviarlo no se manda nada a ningún servidor, solo verás un mensaje de confirmación en esta página.</p>
+
+            <div class="campo">
+              <label for="f-nombre">Nombre y apellidos</label>
+              <input id="f-nombre" name="nombre" type="text" autocomplete="name" required minlength="3" aria-describedby="e-nombre">
+              <p class="campo__error" id="e-nombre"></p>
+            </div>
+            <div class="campo">
+              <label for="f-email">Correo electrónico</label>
+              <input id="f-email" name="email" type="email" autocomplete="email" required aria-describedby="e-email">
+              <p class="campo__error" id="e-email"></p>
+            </div>
+            <div class="campo">
+              <label for="f-entidad">Tipo de entidad</label>
+              <select id="f-entidad" name="entidad" required aria-describedby="e-entidad">
+                <option value="">Elige una opción</option>
+                <option>Particular</option>
+                <option>Colegio o instituto</option>
+                <option>Empresa u oficina</option>
+                <option>Ayuntamiento u otra administración</option>
+                <option>Empresa de transporte</option>
+              </select>
+              <p class="campo__error" id="e-entidad"></p>
+            </div>
+            <div class="campo">
+              <label for="f-mensaje">Mensaje <span class="opcional">(opcional)</span></label>
+              <textarea id="f-mensaje" name="mensaje" rows="4" maxlength="600"></textarea>
+            </div>
+            <div class="campo campo--check">
+              <input id="f-acepto" name="acepto" type="checkbox" required aria-describedby="e-acepto">
+              <label for="f-acepto">Entiendo que es una simulación y que no se guardan mis datos.</label>
+              <p class="campo__error" id="e-acepto"></p>
+            </div>
+            <button class="boton boton--principal" type="submit">Enviar solicitud</button>
+            <div class="formulario__ok" id="formulario-ok" role="status" tabindex="-1" hidden></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== PIE ===================== -->
+  <footer class="pie">
+    <div class="contenedor pie__dentro">
+      <div class="pie__marca">
+        <img src="img/marinada-labs.svg" alt="" width="40" height="40">
+        <p><strong>Marinada Labs</strong><br>Respira VLC, el aire de València calle a calle.</p>
+      </div>
+      <p class="pie__aviso">Proyecto educativo ficticio de 2.º ASIR. Propuesta dirigida al Ayuntamiento de València; no es una colaboración oficial.</p>
+      <p class="pie__creditos">Logotipos e ilustraciones propios. Miniaturas de vídeo: YouTube / OMS. Tipografía Bricolage Grotesque (licencia SIL Open Font License).</p>
+      <nav class="pie__nav" aria-label="Enlaces del pie de página"><a href="#mapa">Explora el mapa ↗</a><a href="#datos">Consulta los datos ↗</a><a href="#catalogo">Encuentra tu sensor ↗</a><a href="#inicio">Volver arriba ↑</a></nav>
+    </div>
+  </footer>
+
+  <!-- Copias de respaldo de data/*.json: se usan si fetch falla (por ejemplo, al abrir el HTML con file://) -->
+  <!-- COPIAS-DATOS: inicio (no editar a mano: lo genera actualizar_copias.py) -->
+  <script type="application/json" id="datos-2024">{"fuente":"Generalitat Valenciana – Red Valenciana de Vigilancia y Control de la Contaminación Atmosférica, Evaluación de la Calidad del Aire 2024 (resumen por parámetro)","fuente_url":"https://rvvcca.pica.gva.es/sites/default/files/2026-02/II.%20RESUMEN%20PARAMETROS%20ECA%202024%20CAS.pdf","anio":2024,"unidad":"µg/m³","limites":{"no2":{"ue_actual":40,"ue_2030":20,"oms":10},"pm25":{"ue_actual":25,"ue_2030":10,"oms":5}},"estaciones":[{"estacion":"Av. França","no2_media_anual":14,"pm25_media_anual":10.0,"no2_horas_sobre_200":0,"datos_validos_no2_pct":99},{"estacion":"Bulevard Sud","no2_media_anual":14,"pm25_media_anual":null,"no2_horas_sobre_200":0,"datos_validos_no2_pct":99},{"estacion":"Molí del Sol","no2_media_anual":16,"pm25_media_anual":10.0,"no2_horas_sobre_200":0,"datos_validos_no2_pct":94},{"estacion":"Pista de Silla","no2_media_anual":19,"pm25_media_anual":6.0,"no2_horas_sobre_200":0,"datos_validos_no2_pct":99},{"estacion":"Politècnic","no2_media_anual":11,"pm25_media_anual":11.0,"no2_horas_sobre_200":0,"datos_validos_no2_pct":97},{"estacion":"Vivers","no2_media_anual":18,"pm25_media_anual":12.0,"no2_horas_sobre_200":0,"datos_validos_no2_pct":97},{"estacion":"Centre","no2_media_anual":20,"pm25_media_anual":12.0,"no2_horas_sobre_200":0,"datos_validos_no2_pct":99},{"estacion":"Olivereta","no2_media_anual":30,"pm25_media_anual":13.0,"no2_horas_sobre_200":0,"datos_validos_no2_pct":99}],"resumen":{"no2_media":17.8,"no2_max":{"valor":30,"estacion":"Olivereta"},"no2_min":{"valor":11,"estacion":"Politècnic"},"pm25_media":10.6,"pm25_max":{"valor":13,"estacion":"Olivereta"},"no2_estaciones_sobre_ue2030":["Olivereta"],"no2_estaciones_en_o_sobre_ue2030":["Centre","Olivereta"],"pm25_estaciones_sobre_ue2030":["Politècnic","Vivers","Centre","Olivereta"],"no2_estaciones_sobre_oms":8,"pm25_estaciones_sobre_oms":7,"total_estaciones":8}}</script>
+  <script type="application/json" id="datos-evolucion">{"fuente":"Ajuntament de València, datos abiertos: datos horarios de calidad del aire (2016-2022)","estaciones":["Avda. Francia","Bulevard Sud","Pista Silla","Politecnico","Viveros"],"anios":[2016,2017,2018,2019,2020,2021,2022],"no2_media":[29.8,30.8,27.7,24.5,18.4,17.2,16.0]}</script>
+  <script type="application/json" id="datos-horas">{"fuente":"Ajuntament de València, datos abiertos: datos por horas calidad aire 2021-2022","anio":2022,"horas":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],"no2_media":[18.3,16.0,13.6,12.6,13.1,17.0,25.1,31.2,30.9,26.8,23.4,20.9,19.4,18.1,17.2,17.1,18.7,22.7,26.2,27.7,28.2,26.5,23.9,21.1]}</script>
+  <!-- COPIAS-DATOS: fin -->
+
+  <!-- Bibliotecas: primero la copia local (vendor/). Si por lo que sea no está,
+       la pedimos al CDN como respaldo. Si tampoco hay Internet, la web avisa y enseña la tabla. -->
+  <script src="vendor/chart.umd.min.js"></script>
+  <script>window.Chart || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>');</script>
+  <script src="vendor/leaflet.min.js"></script>
+  <script>window.L || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"><\/script>');</script>
+
+  <!-- Nuestro código, en el orden en que se necesita -->
+  <script src="js/main.js" defer></script>
+  <script src="js/hero.js" defer></script>
+  <script src="js/datos.js" defer></script>
+  <script src="js/mapa.js" defer></script>
+  <script src="js/tienda.js" defer></script>
+  <script src="js/experience.js" defer></script>
+  <script src="js/story.js" defer></script>
+</body>
+</html>

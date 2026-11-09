@@ -1,0 +1,122 @@
+/* Una historia al bajar: la ciudad permanece, la red aparece por etapas. */
+.viaje { display: grid; grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr); gap: 44px; align-items: start; margin: 52px 0 48px; }
+.viaje-stage { position: sticky; top: calc(var(--alto-cabecera) + 24px); height: min(640px, calc(100svh - 130px)); min-height: 420px; border-radius: 24px; overflow: hidden; background: #101f19; color: #eff5e8; isolation: isolate; box-shadow: 0 24px 50px -30px #193e3180; }
+.viaje-stage::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 55% 70%, #4f7a4433, transparent 65%); }
+.viaje-stage__cabecera { position: absolute; top: 24px; left: 26px; right: 26px; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: .55rem; letter-spacing: .15em; color: #bed2bd; }
+.viaje-stage__cabecera > span:last-child { border: 1px solid #8aaf874a; border-radius: 20px; padding: 5px 10px; font-size: .48rem; }
+.viaje-mundo { position: absolute; inset: 50px 0 92px; }
+.viaje-mundo img { display: block; width: 100%; height: 100%; object-fit: contain; transition: transform 1.4s cubic-bezier(.2,.7,.2,1), filter 1.4s; }
+.viaje-stage[data-etapa="1"] .viaje-mundo img { filter: saturate(.7) brightness(.82); }
+.viaje-stage[data-etapa="2"] .viaje-mundo img { transform: scale(1.04); }
+.viaje-stage[data-etapa="3"] .viaje-mundo img { transform: scale(1.07) translateX(-2%); }
+.viaje-stage[data-etapa="4"] .viaje-mundo img { transform: scale(1.03); filter: saturate(1.15) brightness(1.08); }
+.viaje-red { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.viaje-red__lineas { fill: none; stroke: #c0f49f; stroke-width: 1.8; stroke-dasharray: 7 8; opacity: 0; transition: opacity .8s; animation: ruta-datos 9s linear infinite; }
+.viaje-red__nodos { fill: #efffd9; stroke: #9fe279; stroke-width: 3; filter: drop-shadow(0 0 8px #b5f08f); }
+.viaje-red__hub { fill: #c5eca922; stroke: #c5eca9; stroke-width: 1.3; opacity: 0; transition: opacity .8s, transform .8s; }
+.viaje-red__hub circle:last-of-type { fill: #c5eca9; }
+.viaje-red__hub path { fill: none; stroke: #101f19; stroke-width: 2; }
+.viaje-stage:not([data-etapa="1"]) .viaje-red__lineas, .viaje-stage:not([data-etapa="1"]) .viaje-red__hub { opacity: 1; }
+.viaje-pulso { position: absolute; width: 32px; height: 32px; border: 1px solid #c5eca9; border-radius: 50%; pointer-events: none; animation: pulso-ciudad 3s ease-out infinite; }
+.viaje-pulso--1 { left: 42%; top: 47%; }
+.viaje-pulso--2 { left: 72%; top: 63%; animation-delay: -1s; }
+.viaje-pulso--3 { left: 28%; top: 59%; animation-delay: -2s; }
+.viaje-panel { position: absolute; right: 24px; top: 31%; width: 174px; padding: 18px; border-radius: 14px; border: 1px solid #d3efc366; background: #14291eee; color: #e9f5dd; box-shadow: 0 15px 35px #0004; opacity: 0; transform: translateY(20px); transition: opacity .65s, transform .65s; }
+.viaje-panel > span { display: block; font-size: .43rem; letter-spacing: .1em; color: #bdd8ac; }
+.viaje-panel strong { display: block; font-size: 1.45rem; line-height: 1.1; font-weight: 500; letter-spacing: -.035em; margin-top: 10px; }
+.viaje-panel small { font-size: .4rem; letter-spacing: .06em; color: #bdd8ac; }
+.viaje-panel__barras { display: flex; align-items: end; gap: 4px; height: 45px; margin: 18px 0 8px; }
+.viaje-panel__barras i { background: #b6e89a; width: 12px; height: 40%; border-radius: 2px 2px 0 0; transform-origin: bottom; transition: transform .8s .2s; transform: scaleY(.1); }
+.viaje-panel__barras i:nth-child(2n) { height: 65%; background: #6c9a62; }
+.viaje-panel__barras i:nth-child(3n) { height: 90%; }
+.viaje-stage[data-etapa="3"] .viaje-panel, .viaje-stage[data-etapa="4"] .viaje-panel { opacity: 1; transform: none; }
+.viaje-stage[data-etapa="3"] .viaje-panel__barras i, .viaje-stage[data-etapa="4"] .viaje-panel__barras i { transform: scaleY(1); }
+.viaje-stage__pie { position: absolute; bottom: 84px; left: 26px; right: 26px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.viaje-stage__pie > span:first-child { font-size: clamp(1rem, 1.8vw, 1.5rem); letter-spacing: -.03em; }
+.viaje-stage__indicio { font-size: .48rem; letter-spacing: .12em; color: #bdd0b3; }
+.viaje-stage__progreso { position: absolute; left: 26px; right: 26px; bottom: 68px; height: 2px; background: #65825755; }
+.viaje-stage__progreso i { display: block; width: 100%; height: 100%; background: #c5eca9; transform: scaleX(.25); transform-origin: left; transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+.viaje-indice { position: absolute; left: 20px; bottom: 20px; display: flex; gap: 3px; }
+.viaje-indice a { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: #c8dac0; text-decoration: none; font-size: .63rem; transition: background .25s, color .25s; }
+.viaje-indice a:hover { background: #c5eca922; }
+.viaje-indice a[aria-current="step"] { background: #c5eca9; color: #193e31; }
+.viaje-stage__nota { position: absolute; right: 24px; bottom: 18px; width: 45%; text-align: right; font-size: .47rem; line-height: 1.6; color: #b5c6ae; margin: 0; }
+.viaje-relato { padding: 70px 0; }
+.viaje-paso { min-height: 310px; display: flex; flex-direction: column; justify-content: center; border-left: 2px solid var(--borde); padding: 24px 0 24px 24px; transition: border-color .6s; scroll-margin-top: 28vh; }
+.viaje-paso > span { font-size: .61rem; letter-spacing: .13em; color: var(--tinta-3); margin-bottom: 16px; }
+.viaje-paso h3 { font-size: clamp(1.6rem, 2.8vw, 2.5rem); font-weight: 600; letter-spacing: -.045em; line-height: 1.08; margin-bottom: 18px; transition: color .5s; }
+.viaje-paso > p { font-size: .9rem; line-height: 1.8; color: var(--tinta-2); max-width: 35ch; }
+.viaje-paso--activo { border-color: var(--verde); }
+.viaje-paso--activo h3 { color: var(--verde-texto); }
+.viaje-paso__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.viaje-paso__chips span { display: inline-block; border: 1px solid var(--borde); border-radius: 30px; padding: 4px 10px; font-size: .62rem; color: var(--tinta-2); }
+.viaje-paso a { display: inline-flex; gap: 20px; align-items: center; min-height: 44px; font-size: .8rem; text-decoration: none; font-weight: 650; }
+.viaje-paso a:hover { text-decoration: underline; }
+.esquema-tecnico { border-block: 1px solid var(--borde); margin-bottom: 32px; }
+.esquema-tecnico summary { min-height: 64px; padding-block: 18px; cursor: pointer; font-size: .9rem; }
+.esquema-tecnico summary span { float: right; font-size: 1.25rem; }
+.esquema-tecnico[open] summary span { rotate: 45deg; }
+.esquema-tecnico .diagrama { margin-top: 24px; }
+.viaje-stage--pausada *, .viaje-stage--pausada *::before { animation-play-state: paused !important; }
+/* La calculadora también dibuja: una representación proporcional, no un mapa. */
+.calculadora__vista { min-width: 0; }
+.calculadora__controles { position: sticky; top: calc(var(--alto-cabecera) + 32px); padding: 28px; background: var(--superficie); border: 1px solid var(--borde); border-radius: 18px; }
+.red-presets__etiqueta { font-size: .57rem; letter-spacing: .12em; font-weight: 650; color: var(--tinta-3); margin-bottom: 12px; }
+.red-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 32px; }
+.red-presets button { font: 500 .7rem var(--fuente); padding: 8px 11px; min-height: 40px; border: 1px solid var(--borde); border-radius: 6px; color: var(--tinta); background: var(--fondo); cursor: pointer; }
+.red-presets button:hover, .red-presets button[aria-pressed="true"] { background: var(--verde-suave); color: var(--verde-texto); border-color: var(--verde); }
+.red-presets button:disabled { opacity: .5; cursor: default; }
+.red-visual { background: #101f19; border-radius: 18px; position: relative; color: #ebf4e3; overflow: hidden; padding: 24px 28px 20px; min-height: 320px; margin-bottom: 16px; }
+.red-visual__cabecera { position: relative; z-index: 2; display: flex; justify-content: space-between; gap: 20px; align-items: start; }
+.red-visual__cabecera > span { font-size: .53rem; letter-spacing: .13em; color: #acc6a6; padding-top: 8px; }
+.red-visual__cabecera > strong { display: block; text-align: right; font-size: 2.5rem; line-height: 1; letter-spacing: -.05em; font-weight: 500; }
+.red-visual__cabecera small { display: block; font-size: .6rem; color: #c0d4b8; letter-spacing: 0; line-height: 1.5; margin-top: 5px; font-weight: 400; }
+.red-visual__plano { display: block; width: 100%; height: 190px; margin-block: 6px; }
+.red-visual__plano circle { transition: opacity .5s ease, fill .5s ease; }
+.red-visual__escala { font-size: .58rem; color: #bdd2b5; margin: 0 0 12px; }
+.red-visual__leyenda { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: .62rem; color: #e0edda; }
+.red-visual__leyenda > span { display: inline-flex; align-items: center; gap: 6px; }
+.red-visual__leyenda i { display: block; width: 6px; height: 6px; border-radius: 50%; }
+.red-colegio { background: #9fd9c2; }
+.red-farola { background: #c6eba7; }
+.red-movil { background: #e6a273; }
+/* La elección de gama es el último capítulo. */
+#catalogo { position: relative; background: var(--fondo); padding-top: 100px; }
+#titulo-catalogo { font-size: clamp(3.5rem, 7vw, 6.5rem); max-width: 13ch; line-height: .98; margin-bottom: 28px; }
+.catalogo__cabecera { float: right; margin-top: -12px; }
+.catalogo__cabecera .boton-carrito { width: 60px; height: 60px; background: var(--verde-suave); border: 1px solid var(--borde); color: var(--verde-texto); }
+.catalogo__cabecera .boton-carrito__num { background: var(--verde); color: #fff; min-width: 22px; height: 22px; line-height: 22px; font-size: .72rem; }
+#catalogo .entradilla { max-width: 68ch; margin-bottom: 52px; }
+#catalogo .producto__dibujo { height: 142px; padding: 24px 0; }
+.nav .nav__gamas { border: 1px solid var(--borde); }
+.boton-movimiento { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; color: inherit; background: transparent; cursor: pointer; }
+.boton-movimiento:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+.boton-movimiento:disabled { opacity: .5; cursor: default; }
+.boton-movimiento .icono-play { display: none; }
+.boton-movimiento[aria-pressed="true"] .icono-play { display: block; }
+.boton-movimiento[aria-pressed="true"] .icono-pausa { display: none; }
+.fuentes-panel { border-block: 1px solid var(--borde); padding-block: 8px; }
+.fuentes-panel summary { cursor: pointer; padding-block: 20px; font-size: 1rem; font-weight: 550; }
+.fuentes-panel summary > span { float: right; font-size: .75rem; font-weight: 400; color: var(--tinta-3); padding-top: 5px; }
+.fuentes-panel .fuentes { padding-bottom: 20px; font-size: .92rem; }
+.kpis { gap: 12px; background: none; border: 0; border-radius: 0; overflow: visible; }
+.kpi { border: 1px solid var(--borde); border-radius: 14px; padding: 24px; }
+.kpi:first-child { background: var(--tinta); color: var(--fondo); }
+.kpi:first-child .kpi__etiqueta, .kpi:first-child .kpi__valor small { color: var(--fondo); }
+.kpi__valor { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 550; margin-top: 12px; }
+.persona { padding: 30px; }
+.persona__avatar { width: 90px; height: 90px; }
+.persona h3 { font-size: 1.8rem; letter-spacing: -.04em; }
+@supports (animation-timeline: view()) {
+  .seccion > .contenedor > h2 { animation: titulo-entrada linear both; animation-timeline: view(); animation-range: entry 0% entry 95%; }
+}
+@keyframes titulo-entrada { from { opacity: .25; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes pulso-ciudad { 0% { opacity: .85; transform: scale(.4); } 100% { opacity: 0; transform: scale(2.5); } }
+@media (max-width: 900px) { .viaje { gap: 24px; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } .viaje-paso { padding-left: 16px; } .viaje-paso h3 { font-size: 1.6rem; } .viaje-stage__indicio { display: none; } .viaje-stage__nota { font-size: .43rem; } }
+@media (max-width: 700px) { .viaje { grid-template-columns: 1fr; } .viaje-stage { position: relative; top: 0; height: 480px; } .viaje-relato { padding: 0; } .viaje-paso { min-height: 230px; } .viaje-panel { width: 145px; right: 14px; } .calculadora__controles { position: static; padding: 20px; } .red-visual { padding: 20px; } #catalogo { padding-top: 60px; } }
+@media (prefers-reduced-motion: reduce) { .viaje *, .red-visual * { animation: none !important; transition: none !important; } .viaje-mundo img { transform: none !important; } .viaje-pulso { display: none; } }
+@media print { .viaje { grid-template-columns: 1fr; } .viaje-stage { position: relative; top: 0; height: 430px; break-inside: avoid; } .viaje-relato { padding: 0; } .viaje-paso { min-height: auto; margin-block: 20px; } .calculadora__controles { position: static; } }
+.movimiento-pausado { scroll-behavior: auto; }
+.movimiento-pausado *, .movimiento-pausado *::before, .movimiento-pausado *::after { animation: none !important; transition: none !important; }
+.movimiento-pausado .aire-vista__mapa, .movimiento-pausado .producto.tilt--activo, .movimiento-pausado .viaje-mundo img { transform: none !important; }
+.movimiento-pausado .viaje-pulso { display: none; }

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="t">
+  <title id="t">Respira VLC</title>
+  <!-- Logotipo del producto Respira VLC: una "R" cuya pata se convierte en una ráfaga de brisa -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="#0C2D48"/>
+  <!-- Asta y panza de la R -->
+  <path d="M20 50V15h13c8 0 13 5 13 11s-5 11-13 11H20" fill="none" stroke="#F6F8F7" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Pata de la R convertida en brisa que se enrosca -->
+  <path d="M31 37c7 2 8 13 16 13 5 0 7-6 2-8" fill="none" stroke="#3FBF8A" stroke-width="5" stroke-linecap="round"/>
+  <!-- Partícula de aire medida -->
+  <circle cx="50" cy="16" r="3.5" fill="#E8892B"/>
+</svg>

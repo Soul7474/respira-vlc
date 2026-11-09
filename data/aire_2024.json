@@ -1,0 +1,108 @@
+{
+  "fuente": "Generalitat Valenciana – Red Valenciana de Vigilancia y Control de la Contaminación Atmosférica, Evaluación de la Calidad del Aire 2024 (resumen por parámetro)",
+  "fuente_url": "https://rvvcca.pica.gva.es/sites/default/files/2026-02/II.%20RESUMEN%20PARAMETROS%20ECA%202024%20CAS.pdf",
+  "anio": 2024,
+  "unidad": "µg/m³",
+  "limites": {
+    "no2": {
+      "ue_actual": 40,
+      "ue_2030": 20,
+      "oms": 10
+    },
+    "pm25": {
+      "ue_actual": 25,
+      "ue_2030": 10,
+      "oms": 5
+    }
+  },
+  "estaciones": [
+    {
+      "estacion": "Av. França",
+      "no2_media_anual": 14,
+      "pm25_media_anual": 10.0,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 99
+    },
+    {
+      "estacion": "Bulevard Sud",
+      "no2_media_anual": 14,
+      "pm25_media_anual": null,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 99
+    },
+    {
+      "estacion": "Molí del Sol",
+      "no2_media_anual": 16,
+      "pm25_media_anual": 10.0,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 94
+    },
+    {
+      "estacion": "Pista de Silla",
+      "no2_media_anual": 19,
+      "pm25_media_anual": 6.0,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 99
+    },
+    {
+      "estacion": "Politècnic",
+      "no2_media_anual": 11,
+      "pm25_media_anual": 11.0,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 97
+    },
+    {
+      "estacion": "Vivers",
+      "no2_media_anual": 18,
+      "pm25_media_anual": 12.0,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 97
+    },
+    {
+      "estacion": "Centre",
+      "no2_media_anual": 20,
+      "pm25_media_anual": 12.0,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 99
+    },
+    {
+      "estacion": "Olivereta",
+      "no2_media_anual": 30,
+      "pm25_media_anual": 13.0,
+      "no2_horas_sobre_200": 0,
+      "datos_validos_no2_pct": 99
+    }
+  ],
+  "resumen": {
+    "no2_media": 17.8,
+    "no2_max": {
+      "valor": 30,
+      "estacion": "Olivereta"
+    },
+    "no2_min": {
+      "valor": 11,
+      "estacion": "Politècnic"
+    },
+    "pm25_media": 10.6,
+    "pm25_max": {
+      "valor": 13,
+      "estacion": "Olivereta"
+    },
+    "no2_estaciones_sobre_ue2030": [
+      "Olivereta"
+    ],
+    "no2_estaciones_en_o_sobre_ue2030": [
+      "Centre",
+      "Olivereta"
+    ],
+    "pm25_estaciones_sobre_ue2030": [
+      "Politècnic",
+      "Vivers",
+      "Centre",
+      "Olivereta"
+    ],
+    "no2_estaciones_sobre_oms": 8,
+    "pm25_estaciones_sobre_oms": 7,
+    "total_estaciones": 8
+  }
+}

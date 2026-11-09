@@ -1,0 +1,110 @@
+/* La capa expresiva: profundidad, aire en movimiento y una red que responde. */
+.hero__resalte {
+  background: linear-gradient(105deg, var(--verde) 10%, #6b9d5c 45%, var(--verde) 80%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: color-aire 7s ease-in-out infinite;
+}
+.hero__resalte::after { content: ''; position: absolute; left: 4px; bottom: -8px; width: 88%; height: 8px; border-radius: 50%; border-top: 3px solid var(--azahar); rotate: -3deg; transform-origin: left; animation: dibujar 1.3s .5s both; }
+.hero__lienzo { opacity: .25; }
+.aire-vista { perspective: 1100px; }
+.aire-vista__mapa { transform: rotateX(var(--giro-x, 2deg)) rotateY(var(--giro-y, -4deg)); transition: transform .35s ease-out, box-shadow .4s; box-shadow: 10px 16px 0 -5px var(--tinte), 12px 18px 0 -5px var(--borde), 0 35px 55px -35px #193e3166; will-change: transform; }
+.aire-vista__mapa::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--luz-x, 80%) var(--luz-y, 10%), #ffffff65, transparent 48%); z-index: 1; }
+.estacion-card { animation: flotar-tarjeta 6s ease-in-out infinite; }
+.aire-nodo--activo .aire-nodo__halo { transform-box: fill-box; transform-origin: center; animation: pulso-nodo 2.5s ease-out infinite; }
+.aire-rutas { stroke-dasharray: 5 10; opacity: .45; animation: ruta-datos 10s linear infinite; }
+.aire-vista__senal { animation: senal 4s ease-in-out infinite; }
+.producto, .ficha { position: relative; isolation: isolate; }
+.producto::before, .ficha::before { content: ''; position: absolute; z-index: -1; inset: 0; border-radius: inherit; background: radial-gradient(350px circle at var(--luz-x, 50%) var(--luz-y, 0%), color-mix(in srgb, var(--verde) 12%, transparent), transparent 70%); opacity: 0; transition: opacity .3s; pointer-events: none; }
+.producto:hover::before, .ficha:hover::before { opacity: 1; }
+.producto.tilt--activo { transform: perspective(900px) rotateX(var(--giro-x, 0deg)) rotateY(var(--giro-y, 0deg)) translateY(-7px); box-shadow: 0 24px 35px -25px #193e3155; z-index: 2; }
+.producto__dibujo { transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+.producto:hover .producto__dibujo { transform: translateY(-5px) scale(1.06); }
+.il-ondas { animation: senal 2s ease-in-out infinite; }
+.il-sensor { filter: drop-shadow(0 0 4px #d9754355); }
+.ilustracion-calle { overflow: hidden; }
+.boton { transition: background-color .2s, color .2s, border-color .2s, transform .2s, box-shadow .2s; }
+.boton:hover { transform: translateY(-2px); box-shadow: 0 6px 16px #193e3112; }
+.boton:active { transform: translateY(0) scale(.98); }
+.hero__botones .boton span { transition: transform .25s; }
+.hero__botones .boton:hover span { transform: translate(3px, -3px); }
+.brisa-lab { background: #101f19; color: #eff5e8; overflow: hidden; position: relative; padding: 70px 0; isolation: isolate; }
+.brisa-lab::before { content: ''; position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 75% 50%, #25563860, transparent 60%), linear-gradient(#ffffff04 1px, transparent 1px), linear-gradient(90deg, #ffffff04 1px, transparent 1px); background-size: auto, 60px 60px, 60px 60px; }
+.brisa-lab::after { content: ''; width: 500px; height: 500px; border-radius: 50%; position: absolute; left: -330px; bottom: -350px; border: 1px solid #80d6a622; box-shadow: 0 0 0 70px #80d6a608, 0 0 0 140px #80d6a605; z-index: -1; }
+.brisa-lab__grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 25px; align-items: center; }
+.brisa-lab__texto { position: relative; z-index: 2; }
+.brisa-lab__etiqueta { display: flex; align-items: center; gap: 9px; font-size: .61rem; letter-spacing: .13em; font-weight: 600; color: #bdd0bd; margin: 0 0 34px; }
+.brisa-lab__etiqueta > span { width: 6px; height: 6px; border-radius: 50%; background: #e9a273; box-shadow: 0 0 14px #e9a273; }
+.brisa-lab h2 { font-size: clamp(3.5rem, 6vw, 5.7rem); line-height: 1.02; letter-spacing: -.055em; font-weight: 600; margin-bottom: 30px; }
+.brisa-lab h2 em { font-style: normal; color: #a8df9a; }
+.brisa-lab__texto > p:not([class]) { font-size: 1rem; color: #b5c9b9; line-height: 1.8; max-width: 40ch; }
+.brisa-lab__acciones { margin-top: 32px; }
+.brisa-boton { display: inline-flex; align-items: center; gap: 14px; min-height: 54px; border: 1px solid #c5eca9; background: #c5eca9; color: #10291d; font: 650 .87rem var(--fuente); border-radius: 9px; padding: 12px 22px; cursor: pointer; transition: box-shadow .3s, background .3s, transform .2s; }
+.brisa-boton:hover { box-shadow: 0 0 32px #c5eca933; transform: translateY(-2px); background: #dbffc1; }
+.brisa-boton[aria-pressed="true"] { background: transparent; color: #c5eca9; }
+.brisa-boton[aria-pressed="true"] svg { animation: viento-boton 1s ease-in-out infinite; }
+.brisa-boton:disabled { opacity: .5; cursor: default; }
+.brisa-lab__instruccion { font-size: .72rem; color: #a2baa8; margin: 12px 0 0; }
+.brisa-lab__nota { margin: 32px 0 0; font-size: .61rem; color: #a2baa8; }
+.brisa-escena { position: relative; min-width: 0; height: 540px; perspective: 1000px; }
+#lienzo-brisa { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.brisa-orbita { position: absolute; top: 50%; left: 50%; border: 1px solid #8ae9ac17; border-radius: 50%; translate: -50% -50%; pointer-events: none; }
+.brisa-orbita--1 { width: 260px; height: 260px; }
+.brisa-orbita--2 { width: 390px; height: 390px; border-style: dashed; animation: orbitar 90s linear infinite; }
+.brisa-orbita--3 { width: 530px; height: 530px; }
+.brisa-orbita--1::before { content: ''; position: absolute; top: -4px; left: calc(50% - 4px); width: 8px; height: 8px; background: #c5eca9; box-shadow: 0 0 20px #c5eca9; border-radius: 50%; }
+.brisa-orbita--1 { animation: orbitar 20s linear infinite; }
+.brisa-conexiones { width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.brisa-conexiones path { fill: none; stroke: #9bd699; stroke-width: 1; stroke-dasharray: 4 9; opacity: .4; animation: ruta-datos 12s linear infinite; }
+.brisa-terminal { position: absolute; z-index: 3; display: flex; gap: 9px; align-items: center; border: 1px solid #45614c; border-radius: 10px; background: #192e23ec; padding: 11px 13px; color: #e2efdc; box-shadow: 0 8px 25px #0002; font-size: .73rem; }
+.brisa-terminal > span { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid #608369; border-radius: 7px; font-size: 1.2rem; color: #bbdda9; }
+.brisa-terminal small { display: block; font-size: .48rem; color: #a7c4aa; letter-spacing: .12em; margin-top: 3px; }
+.brisa-terminal i { display: block; width: 5px; height: 5px; border-radius: 50%; background: #b4cd9d; margin-left: 7px; }
+.brisa-terminal--cole { left: 2%; top: 14%; animation: flotar-terminal 6s ease-in-out infinite; }
+.brisa-terminal--farola { right: 0; top: 17%; animation: flotar-terminal 7s -2s ease-in-out infinite; }
+.brisa-terminal--emt { left: 0; bottom: 18%; animation: flotar-terminal 7s -4s ease-in-out infinite; }
+.brisa-terminal--bici { right: 1%; bottom: 16%; animation: flotar-terminal 6s -3s ease-in-out infinite; }
+.sensor-3d { position: absolute; top: 50%; left: 50%; width: 154px; height: 203px; margin: -105px 0 0 -77px; transform-style: preserve-3d; transform: rotateX(calc(9deg + var(--sensor-x, 0deg))) rotateY(calc(-18deg + var(--sensor-y, 0deg))) rotateZ(-8deg); transition: transform .3s ease-out; animation: flotacion-sensor 7s ease-in-out infinite; }
+.sensor-3d__cara { position: absolute; inset: 0; z-index: 2; background: linear-gradient(130deg, #f5f8e9, #d0d9c4); border-radius: 21px; border: 1px solid #faffee; box-shadow: inset 3px 3px 6px #fff8, inset -3px -3px 6px #586b4233, 12px 25px 30px #0005; padding: 18px; }
+.sensor-3d__lado { position: absolute; right: -13px; top: 3px; width: 30px; height: 197px; background: linear-gradient(90deg, #80977b, #b3c3a3); transform: translateZ(-12px); border-radius: 0 22px 22px 0; }
+.sensor-3d__marca { color: #23452f; font-size: 1.15rem; font-weight: 750; letter-spacing: -.06em; display: flex; align-items: baseline; justify-content: space-between; }
+.sensor-3d__marca > span { font-size: .6rem; font-weight: 550; letter-spacing: .04em; }
+.sensor-3d__pantalla { height: 80px; padding: 8px; background: #203e2d; border: 3px solid #bbc8ac; border-radius: 9px; margin-top: 10px; color: #c5eca9; overflow: hidden; }
+.sensor-3d__pantalla > span { font-size: .37rem; letter-spacing: .1em; display: block; }
+.sensor-3d__pantalla svg { display: block; height: 29px; width: 100%; }
+.sensor-3d__pantalla path { fill: none; stroke: #b3f28c; stroke-width: 1.5; stroke-dasharray: 160; animation: grafico-sensor 3s linear infinite; }
+.sensor-3d__pantalla strong { display: block; font-size: .6rem; font-weight: 450; }
+.sensor-3d__luces { display: flex; justify-content: center; gap: 8px; margin-top: 13px; }
+.sensor-3d__luces i { width: 5px; height: 5px; background: #749b5d; border-radius: 50%; box-shadow: 0 0 6px #93ce63; animation: senal 2s infinite; }
+.sensor-3d__luces i:nth-child(2) { animation-delay: .6s; }
+.sensor-3d__luces i:nth-child(3) { animation-delay: 1.2s; }
+.sensor-3d__ranuras { height: 12px; width: 55px; margin: 13px auto 0; background: repeating-linear-gradient(90deg, #849578 0 2px, transparent 2px 5px); border-radius: 4px; }
+.brisa-escena__estado { display: flex; align-items: center; justify-content: center; gap: 8px; position: absolute; bottom: 0; width: 100%; font-size: .63rem; color: #b5c9b9; }
+.brisa-escena__estado > span:first-child { width: 6px; height: 6px; border-radius: 50%; background: #d99d67; }
+.brisa-lab--activa .brisa-escena__estado > span:first-child { background: #bcf29d; box-shadow: 0 0 15px #bcf29d; }
+.brisa-lab--activa .brisa-terminal i { background: #bcf29d; box-shadow: 0 0 10px #bcf29d; animation: senal 1s ease-in-out infinite; }
+.brisa-lab--activa .brisa-conexiones path { animation-duration: 3s; opacity: .9; }
+.brisa-lab--activa .brisa-orbita--1 { border-color: #b6ee9344; box-shadow: 0 0 80px #a7ef7d0c, inset 0 0 80px #a7ef7d0c; }
+.brisa-lab--pausada *, .brisa-lab--pausada *::before { animation-play-state: paused !important; }
+.cinta-aire { background: #d97543; color: #1e3224; padding: 16px 0; overflow: hidden; border-block: 1px solid #b55e31; }
+.cinta-aire > div { display: flex; width: max-content; animation: cinta 35s linear infinite; }
+.cinta-aire span { white-space: nowrap; font-size: 1rem; letter-spacing: .07em; font-weight: 650; }
+.cinta-aire i { font-size: 1.4rem; font-style: normal; padding-inline: 35px; }
+@keyframes color-aire { 50% { background-position: 100% 50%; } }
+@keyframes dibujar { from { scale: 0 1; } to { scale: 1 1; } }
+@keyframes pulso-nodo { 0% { scale: .6; opacity: .9; } 100% { scale: 1.6; opacity: 0; } }
+@keyframes ruta-datos { to { stroke-dashoffset: -180; } }
+@keyframes flotar-tarjeta { 50% { translate: 0 -7px; } }
+@keyframes flotar-terminal { 50% { translate: 0 -9px; } }
+@keyframes senal { 50% { opacity: .45; } }
+@keyframes orbitar { to { rotate: 360deg; } }
+@keyframes flotacion-sensor { 50% { translate: 0 -14px; } }
+@keyframes grafico-sensor { from { stroke-dashoffset: 320; } to { stroke-dashoffset: 0; } }
+@keyframes viento-boton { 50% { translate: 3px 0; } }
+@keyframes cinta { to { transform: translateX(-50%); } }
+@media (max-width: 1000px) { .brisa-lab__grid { grid-template-columns: 1fr 1fr; } .brisa-terminal { padding: 9px; font-size: .6rem; } .brisa-terminal > span { display: none; } .brisa-terminal i { margin-left: 0; } .brisa-escena { height: 480px; } }
+@media (max-width: 700px) { .brisa-lab__grid { grid-template-columns: 1fr; } .brisa-lab { padding-block: 55px; } .brisa-lab h2 { font-size: 3.8rem; } .brisa-escena { height: 450px; } .brisa-terminal { font-size: .7rem; } .aire-vista__mapa { transform: none; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .aire-vista__mapa, .producto.tilt--activo { transform: none; } .hero__resalte::after { scale: 1; } .cinta-aire > div { transform: none; } }
+@media print { .brisa-lab, .cinta-aire { display: none !important; } .aire-vista__mapa { transform: none; box-shadow: none; } }
